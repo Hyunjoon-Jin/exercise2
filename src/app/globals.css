@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   디자인 토큰
+
+   건강 데이터는 오래 들여다보는 화면이다. 채도를 낮춰 눈이 피로하지 않게 하고,
+   상태 색(정상/주의/범위 밖)만 또렷하게 남긴다.
+
+   상태 색은 색만으로 구분되지 않도록 UI 에서 항상 텍스트 라벨과 함께 쓴다
+   (접근성 — 색각 이상 사용자 고려).
+   ============================================================================= */
+
+@theme {
+  /* 브랜드 — 차분한 틸 계열 */
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+
+  /* 지표 상태 */
+  --color-status-normal: #059669;
+  --color-status-caution: #d97706;
+  --color-status-out: #dc2626;
+  --color-status-unknown: #6b7280;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard",
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --surface: #f8fafc;
+  --border: #e2e8f0;
+  --foreground: #0f172a;
+  --muted: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b1120;
+    --surface: #111827;
+    --border: #1f2937;
+    --foreground: #e2e8f0;
+    --muted: #94a3b8;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 숫자 표기 — 표·그래프에서 자릿수 정렬 */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 키보드 사용자에게만 포커스 링을 보인다 */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
