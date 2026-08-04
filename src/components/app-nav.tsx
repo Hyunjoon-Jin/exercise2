@@ -1,10 +1,10 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { NAV_ITEMS, PRIMARY_NAV_ITEMS } from "@/lib/nav";
-import type { Route } from "next";
+import { BOTTOM_NAV_ITEMS, NAV_ITEMS } from "@/lib/nav";
 
 function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -15,7 +15,10 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="주 메뉴" className="hidden w-56 shrink-0 border-r border-border md:block">
+    <nav
+      aria-label="주 메뉴"
+      className="hidden w-56 shrink-0 border-r border-border md:block"
+    >
       <ul className="sticky top-0 space-y-1 p-4">
         {NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
@@ -58,7 +61,7 @@ export function BottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid grid-cols-5">
-        {PRIMARY_NAV_ITEMS.map((item) => {
+        {BOTTOM_NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
           return (

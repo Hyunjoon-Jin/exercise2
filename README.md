@@ -6,12 +6,12 @@
 
 ---
 
-## 현재 상태 — Phase 0 완료
+## 현재 상태 — Phase 1 완료
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| **Phase 0** | 프로젝트 셋업 · 인증 · 동의 · 스키마 · RLS · 앱 셸 | ✅ 완료 |
-| Phase 1 | 신체기록 · 수면 · 복약 | 예정 |
+| Phase 0 | 프로젝트 셋업 · 인증 · 동의 · 스키마 · RLS · 앱 셸 | ✅ 완료 |
+| **Phase 1** | 신체기록 · 수면 · 복약 · 복약 알림 | ✅ 완료 |
 | Phase 2 | 식단 · 운동 | 예정 |
 | Phase 3 | 검진 결과지 자동 판독 | 예정 |
 | Phase 4 | 대시보드 · 주간 리포트 | 예정 |
@@ -92,11 +92,32 @@ src/
                      (Next 16 규약. 15 이전의 middleware.ts 에 해당)
 
 supabase/migrations/
-  0001_initial_schema.sql        전체 스키마
-  0002_rls_policies.sql          RLS 정책 + Storage 버킷
+  0001_initial_schema.sql           전체 스키마
+  0002_rls_policies.sql             RLS 정책 + Storage 버킷
   0003_seed_metric_definitions.sql  지표 마스터 + 정상범위
-  0004_consent_functions.sql     동의 판정 함수 + 동의 문서 v1
+  0004_consent_functions.sql        동의 판정 함수 + 동의 문서 v1
+  0005_phase1_records.sql           파생 지표 트리거 · 복약 스케줄 전개 · 푸시 구독
+  0006_medication_reminders.sql     알림 발송 대상 조회 (스케줄러 전용)
 ```
+
+## 복약 알림 설정
+
+알림은 선택 기능입니다. 아래를 설정하지 않아도 나머지는 모두 동작하며,
+알림 토글만 "설정되지 않음"으로 표시됩니다.
+
+1. VAPID 키 쌍 생성 후 `.env.local` 에 입력
+
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+
+2. `CRON_SECRET` 을 임의의 긴 문자열로 설정
+3. Supabase SQL Editor 에서 pg_cron 작업 등록 —
+   `supabase/migrations/0006_medication_reminders.sql` 하단의 주석 참고
+
+발송 경로는 `pg_cron` → `POST /api/push/dispatch` → `web-push` 입니다.
+`/api/push/dispatch` 는 `CRON_SECRET` 이 없으면 503 으로 닫혀 있으므로,
+설정하지 않은 상태에서 외부에 노출되어도 아무 동작도 하지 않습니다.
 
 ---
 

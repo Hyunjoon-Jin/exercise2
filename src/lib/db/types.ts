@@ -38,6 +38,31 @@ export type ExtractionStatus = "pending" | "running" | "review" | "confirmed" | 
 
 export type ExtractionItemStatus = "pending" | "accepted" | "edited" | "rejected";
 
+export type MedicationForm =
+  | "tablet"
+  | "capsule"
+  | "liquid"
+  | "injection"
+  | "topical"
+  | "inhaler"
+  | "other";
+
+export type MedicationLogStatus = "taken" | "skipped" | "missed";
+
+/** medication_doses_for_date() 반환 행 — 스케줄에서 전개된 그 날의 예정 복용 */
+export interface MedicationDose {
+  schedule_id: string;
+  medication_id: string;
+  medication_name: string;
+  dosage_amount: number | null;
+  dosage_unit: string | null;
+  time_of_day: string;
+  quantity: number;
+  scheduled_for: string;
+  log_id: string | null;
+  status: MedicationLogStatus | null;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -184,6 +209,165 @@ export interface Database {
         };
         Relationships: [];
       };
+
+      sleep_records: {
+        Row: {
+          id: string;
+          user_id: string;
+          sleep_date: string;
+          bed_time: string | null;
+          wake_time: string | null;
+          duration_min: number | null;
+          quality: number | null;
+          note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          sleep_date: string;
+          bed_time?: string | null;
+          wake_time?: string | null;
+          duration_min?: number | null;
+          quality?: number | null;
+          note?: string | null;
+        };
+        Update: {
+          bed_time?: string | null;
+          wake_time?: string | null;
+          duration_min?: number | null;
+          quality?: number | null;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
+
+      medications: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          dosage_amount: number | null;
+          dosage_unit: string | null;
+          form: MedicationForm;
+          purpose: string | null;
+          started_on: string | null;
+          ended_on: string | null;
+          is_active: boolean;
+          note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          name: string;
+          dosage_amount?: number | null;
+          dosage_unit?: string | null;
+          form?: MedicationForm;
+          purpose?: string | null;
+          started_on?: string | null;
+          ended_on?: string | null;
+          note?: string | null;
+        };
+        Update: {
+          name?: string;
+          dosage_amount?: number | null;
+          dosage_unit?: string | null;
+          form?: MedicationForm;
+          purpose?: string | null;
+          started_on?: string | null;
+          ended_on?: string | null;
+          is_active?: boolean;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
+
+      medication_schedules: {
+        Row: {
+          id: string;
+          medication_id: string;
+          user_id: string;
+          time_of_day: string;
+          days_of_week: number[];
+          quantity: number;
+          reminder_enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          medication_id: string;
+          user_id: string;
+          time_of_day: string;
+          days_of_week?: number[];
+          quantity?: number;
+          reminder_enabled?: boolean;
+        };
+        Update: {
+          time_of_day?: string;
+          days_of_week?: number[];
+          quantity?: number;
+          reminder_enabled?: boolean;
+        };
+        Relationships: [];
+      };
+
+      medication_logs: {
+        Row: {
+          id: string;
+          user_id: string;
+          medication_id: string;
+          schedule_id: string | null;
+          scheduled_for: string;
+          taken_at: string | null;
+          status: MedicationLogStatus;
+          note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          medication_id: string;
+          schedule_id?: string | null;
+          scheduled_for: string;
+          taken_at?: string | null;
+          status: MedicationLogStatus;
+          note?: string | null;
+        };
+        Update: {
+          taken_at?: string | null;
+          status?: MedicationLogStatus;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
+
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth_key: string;
+          user_agent: string | null;
+          failure_count: number;
+          last_used_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth_key: string;
+          user_agent?: string | null;
+        };
+        Update: {
+          failure_count?: number;
+          last_used_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
 
     Views: Record<never, never>;
@@ -204,6 +388,50 @@ export interface Database {
           is_required: boolean;
           granted: boolean;
         }[];
+      };
+      latest_metrics: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          metric_code: string;
+          value: number;
+          unit: string;
+          measured_at: string;
+          source: MetricSource;
+        }[];
+      };
+      medication_doses_for_date: {
+        Args: { target_date: string };
+        Returns: MedicationDose[];
+      };
+      medication_adherence: {
+        Args: { days?: number };
+        Returns: number | null;
+      };
+      /** 스케줄러 전용 (service_role). 사용자 세션에서는 호출 권한이 없다. */
+      due_medication_reminders: {
+        Args: { window_minutes?: number };
+        Returns: {
+          subscription_id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth_key: string;
+          medication_id: string;
+          medication_name: string;
+          dosage_amount: number | null;
+          dosage_unit: string | null;
+          schedule_id: string;
+          scheduled_for: string;
+        }[];
+      };
+      mark_push_failure: {
+        Args: { subscription_endpoint: string };
+        Returns: undefined;
+      };
+      mark_push_success: {
+        Args: { subscription_endpoint: string };
+        Returns: undefined;
       };
     };
 
@@ -228,3 +456,7 @@ export type MetricDefinition = Tables<"metric_definitions">;
 export type MetricReferenceRange = Tables<"metric_reference_ranges">;
 export type HealthMetric = Tables<"health_metrics">;
 export type ConsentDocument = Tables<"consent_documents">;
+export type SleepRecord = Tables<"sleep_records">;
+export type Medication = Tables<"medications">;
+export type MedicationSchedule = Tables<"medication_schedules">;
+export type MedicationLog = Tables<"medication_logs">;
