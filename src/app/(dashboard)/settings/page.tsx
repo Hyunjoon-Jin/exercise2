@@ -125,6 +125,23 @@ export default async function SettingsPage() {
       </section>
 
       <section className="mt-8">
+        <h2 className="text-sm font-semibold">내 데이터</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">
+          기록한 모든 데이터를 파일 하나로 내려받을 수 있습니다. 검진 결과지 원본
+          파일은 각 검진 화면에서 따로 받으실 수 있습니다.
+        </p>
+        <a
+          href="/api/export"
+          download
+          className="mt-3 inline-flex min-h-11 items-center rounded-lg border
+                     border-border-strong px-4 text-sm font-medium
+                     transition-colors hover:bg-surface"
+        >
+          내 데이터 내려받기
+        </a>
+      </section>
+
+      <section className="mt-8">
         <h2 className="text-sm font-semibold">세션</h2>
         <form action={signOut} className="mt-3">
           <button
