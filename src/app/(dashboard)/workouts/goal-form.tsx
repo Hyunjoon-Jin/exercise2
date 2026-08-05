@@ -24,13 +24,13 @@ export function GoalForm({ current }: { current: number | null }) {
           defaultValue={current ?? ""}
           placeholder="150"
           aria-label="주간 목표 (분)"
-          className="tabular w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="tabular w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-base placeholder:text-muted focus:border-brand-500"
         />
         <button
           type="submit"
           disabled={pending}
-          className="shrink-0 rounded-lg border border-border px-4 text-sm font-medium
+          className="shrink-0 rounded-lg border border-border-strong px-4 text-sm font-medium
                      transition-colors hover:bg-surface disabled:opacity-60"
         >
           {pending ? "저장 중…" : "저장"}
@@ -44,7 +44,7 @@ export function GoalForm({ current }: { current: number | null }) {
             type="submit"
             name="goal_min"
             value={preset}
-            className="tabular rounded-lg border border-border px-3 py-1.5 text-xs text-muted
+            className="tabular rounded-lg border border-border-strong px-3 py-1.5 text-xs text-muted
                        transition-colors hover:bg-surface hover:text-foreground"
           >
             {preset}분

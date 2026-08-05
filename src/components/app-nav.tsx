@@ -30,7 +30,7 @@ export function SidebarNav() {
                 aria-current={active ? "page" : undefined}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                   active
-                    ? "bg-brand-50 font-medium text-brand-800"
+                    ? "bg-brand-soft font-medium text-brand-strong"
                     : "text-muted hover:bg-surface hover:text-foreground"
                 }`}
               >
@@ -70,7 +70,7 @@ export function BottomNav() {
                 href={item.href as Route}
                 aria-current={active ? "page" : undefined}
                 className={`flex flex-col items-center gap-1 py-2.5 text-[11px] transition-colors ${
-                  active ? "font-medium text-brand-700" : "text-muted"
+                  active ? "font-medium text-brand-text" : "text-muted"
                 }`}
               >
                 <Icon aria-hidden className="size-5" />

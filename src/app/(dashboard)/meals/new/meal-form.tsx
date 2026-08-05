@@ -30,7 +30,7 @@ interface DraftItem {
 }
 
 const FIELD =
-  "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base " +
+  "w-full rounded-lg border border-border-strong bg-background px-3 py-2.5 text-base " +
   "placeholder:text-muted focus:border-brand-500";
 
 function nowLocalInput(): string {
@@ -197,8 +197,8 @@ export function MealForm({ defaultMealType }: { defaultMealType: MealType }) {
               key={type.value}
               className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border
                          border-border py-2.5 text-sm transition-colors
-                         has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50
-                         has-[:checked]:font-medium has-[:checked]:text-brand-800"
+                         has-[:checked]:border-brand-500 has-[:checked]:bg-brand-soft
+                         has-[:checked]:font-medium has-[:checked]:text-brand-strong"
             >
               <input
                 type="radio"
@@ -257,7 +257,7 @@ export function MealForm({ defaultMealType }: { defaultMealType: MealType }) {
                     <span className="block truncate text-sm">
                       {hit.name}
                       {hit.origin === "user" ? (
-                        <span className="ml-1.5 text-[11px] text-brand-600">내 음식</span>
+                        <span className="ml-1.5 text-[11px] text-brand-text">내 음식</span>
                       ) : null}
                     </span>
                     <span className="text-xs text-muted">
@@ -329,7 +329,7 @@ export function MealForm({ defaultMealType }: { defaultMealType: MealType }) {
                   value={item.quantity}
                   onChange={(e) => updateQuantity(item.key, Number(e.target.value) || 1)}
                   aria-label={`${item.displayName} 수량`}
-                  className="tabular w-16 shrink-0 rounded-lg border border-border bg-background
+                  className="tabular w-16 shrink-0 rounded-lg border border-border-strong bg-background
                              px-2 py-1.5 text-sm"
                 />
 

@@ -69,7 +69,7 @@ function Card({
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="text-sm font-semibold">{title}</h3>
         {href ? (
-          <Link href={href as Route} className="text-xs text-brand-600 hover:underline">
+          <Link href={href as Route} className="text-xs text-brand-text hover:underline">
             보기
           </Link>
         ) : null}
@@ -160,7 +160,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         {week < MAX_WEEK_OFFSET ? (
           <Link
             href={`/reports?w=${week + 1}` as Route}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm text-muted
+            className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-muted
                        transition-colors hover:bg-surface"
           >
             ← 이전 주
@@ -175,7 +175,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         {week > 0 ? (
           <Link
             href={(week - 1 === 0 ? "/reports" : `/reports?w=${week - 1}`) as Route}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm text-muted
+            className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-muted
                        transition-colors hover:bg-surface"
           >
             다음 주 →

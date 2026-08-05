@@ -73,7 +73,7 @@ export function MetricRecordForm({ definitions, fixedCode }: Props) {
             name="metric_code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base
+            className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5 text-base
                        focus:border-brand-500"
           >
             {definitions.map((d) => (
@@ -98,7 +98,7 @@ export function MetricRecordForm({ definitions, fixedCode }: Props) {
             step={selected ? 10 ** -selected.decimal_places : "any"}
             required
             autoComplete="off"
-            className="tabular w-full rounded-lg border border-border bg-background px-3 py-2.5
+            className="tabular w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                        text-base focus:border-brand-500"
           />
         </div>
@@ -112,7 +112,7 @@ export function MetricRecordForm({ definitions, fixedCode }: Props) {
             id="measured_at"
             name="measured_at"
             type="datetime-local"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5
+            className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                        text-base focus:border-brand-500"
           />
         </div>

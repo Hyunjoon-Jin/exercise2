@@ -108,7 +108,7 @@ export function ItemRow({
                 name="metric_code"
                 value={code}
                 onChange={(event) => setCode(event.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-2.5 py-2
+                className="w-full rounded-lg border border-border-strong bg-background px-2.5 py-2
                            text-sm focus:border-brand-500"
               >
                 <option value="">— 기록하지 않음 —</option>
@@ -135,7 +135,7 @@ export function ItemRow({
                 inputMode="decimal"
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
-                className="tabular w-full rounded-lg border border-border bg-background px-2.5 py-2
+                className="tabular w-full rounded-lg border border-border-strong bg-background px-2.5 py-2
                            text-sm focus:border-brand-500"
               />
             </div>
@@ -164,7 +164,7 @@ export function ItemRow({
               value="reject"
               formNoValidate
               disabled={pending || item.status === "rejected"}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm text-muted
+              className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-muted
                          transition-colors hover:bg-surface disabled:opacity-50"
             >
               제외

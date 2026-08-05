@@ -15,9 +15,23 @@ const FEATURES = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage({ searchParams }: PageProps<"/">) {
+  const params = await searchParams;
+  const deleted = params.deleted === "1";
+
   return (
     <main className="flex flex-1 flex-col">
+      {/* 탈퇴 직후 돌아오는 자리. 아무 말 없이 첫 화면이 뜨면 정말 지워졌는지
+          알 수 없다. */}
+      {deleted ? (
+        <p
+          role="status"
+          className="border-b border-border bg-surface px-6 py-3 text-center text-sm"
+        >
+          계정과 모든 기록을 삭제했습니다. 그동안 이용해 주셔서 감사합니다.
+        </p>
+      ) : null}
+
       <header className="border-b border-border">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
           <span className="text-lg font-semibold tracking-tight">건강기록</span>
@@ -57,7 +71,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href="/login"
-            className="rounded-xl border border-border px-6 py-3 font-medium transition-colors hover:bg-surface"
+            className="rounded-xl border border-border-strong px-6 py-3 font-medium transition-colors hover:bg-surface"
           >
             이미 계정이 있어요
           </Link>
@@ -77,6 +91,14 @@ export default function LandingPage() {
 
       <footer className="mt-auto border-t border-border">
         <div className="mx-auto w-full max-w-5xl px-6 py-8 text-sm text-muted">
+          <nav aria-label="약관" className="mb-4 flex gap-4">
+            <Link href="/legal/terms" className="text-brand-text hover:underline">
+              이용약관
+            </Link>
+            <Link href="/legal/privacy" className="text-brand-text hover:underline">
+              개인정보 처리방침
+            </Link>
+          </nav>
           <p className="leading-relaxed">
             본 서비스는 의료기기가 아니며 의학적 진단·치료·처방을 제공하지 않습니다.
             표시되는 수치와 참고범위는 참고용이며, 건강상 판단이 필요한 경우 반드시

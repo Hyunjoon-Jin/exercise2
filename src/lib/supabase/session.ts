@@ -5,16 +5,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/lib/db/types";
 
 import { getSupabaseAnonKey, getSupabaseUrl } from "./env";
-
-/** 로그인 없이 접근 가능한 경로 */
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth", "/legal"];
-
-/** 동의를 아직 마치지 않아도 접근 가능한 경로 (동의 절차 자체 + 로그아웃) */
-const CONSENT_EXEMPT_PATHS = ["/onboarding", "/auth", "/legal"];
-
-function matches(pathname: string, paths: string[]): boolean {
-  return paths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-}
+import { isConsentExempt, isPublicPath } from "./paths";
 
 /**
  * 세션 갱신 + 접근 제어.
@@ -49,7 +40,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 미인증 사용자가 보호된 경로에 접근 → 로그인으로
-  if (!user && !matches(pathname, PUBLIC_PATHS)) {
+  if (!user && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
@@ -69,7 +60,7 @@ export async function updateSession(request: NextRequest) {
     //
     // 건강정보는 민감정보이므로 별도 동의 없이 어떤 건강 데이터도
     // 수집·표시해서는 안 된다. 이 게이트가 그 경계다.
-    if (!matches(pathname, CONSENT_EXEMPT_PATHS)) {
+    if (!isConsentExempt(pathname)) {
       const { data: hasConsent } = await supabase.rpc("has_required_consents");
 
       if (hasConsent === false) {

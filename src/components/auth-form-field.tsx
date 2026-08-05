@@ -18,7 +18,7 @@ export function AuthFormField({ label, name, hint, ...inputProps }: Props) {
         id={name}
         name={name}
         aria-describedby={hintId}
-        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base
+        className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5 text-base
                    transition-colors placeholder:text-muted focus:border-brand-500"
         {...inputProps}
       />

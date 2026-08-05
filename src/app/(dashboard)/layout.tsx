@@ -26,6 +26,17 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <div className="flex flex-1 flex-col">
+      {/* 키보드·스크린리더 사용자가 매 화면마다 9개 메뉴를 지나치지 않도록.
+          평소에는 화면 밖에 있다가 포커스를 받으면 나타난다. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4
+                   focus:z-50 focus:rounded-lg focus:bg-brand-600 focus:px-4 focus:py-2
+                   focus:text-sm focus:font-medium focus:text-white"
+      >
+        본문으로 건너뛰기
+      </a>
+
       <header className="border-b border-border">
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
           <Link href="/today" className="text-base font-semibold tracking-tight">
@@ -42,7 +53,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
       <div className="flex flex-1">
         <SidebarNav />
-        <main className="min-w-0 flex-1 px-4 py-6 md:px-8">
+        <main id="main" tabIndex={-1} className="min-w-0 flex-1 px-4 py-6 md:px-8">
           <div className="mx-auto w-full max-w-3xl">{children}</div>
         </main>
       </div>

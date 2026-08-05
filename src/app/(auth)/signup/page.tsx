@@ -15,8 +15,16 @@ export default function SignupPage() {
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">가입하기</h1>
-      <p className="mt-2 text-sm text-muted">
-        가입 후 약관 동의 절차가 이어집니다.
+      <p className="mt-2 text-sm leading-relaxed text-muted">
+        가입 후 약관 동의 절차가 이어집니다. 미리 읽어보실 수 있습니다 —{" "}
+        <Link href="/legal/terms" className="text-brand-text hover:underline">
+          이용약관
+        </Link>
+        ,{" "}
+        <Link href="/legal/privacy" className="text-brand-text hover:underline">
+          개인정보 처리방침
+        </Link>
+        .
       </p>
 
       <form action={formAction} className="mt-8 space-y-4">
@@ -54,7 +62,7 @@ export default function SignupPage() {
         {state.notice ? (
           <p
             role="status"
-            className="rounded-lg border border-brand-200 bg-brand-50 px-3 py-2.5 text-sm text-brand-800"
+            className="rounded-lg border border-brand-200 bg-brand-soft px-3 py-2.5 text-sm text-brand-strong"
           >
             {state.notice}
           </p>
@@ -72,7 +80,7 @@ export default function SignupPage() {
 
       <p className="mt-6 text-center text-sm text-muted">
         이미 계정이 있으신가요?{" "}
-        <Link href="/login" className="font-medium text-brand-600 hover:underline">
+        <Link href="/login" className="font-medium text-brand-text hover:underline">
           로그인
         </Link>
       </p>

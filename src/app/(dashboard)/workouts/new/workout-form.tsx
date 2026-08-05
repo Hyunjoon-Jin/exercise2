@@ -30,7 +30,7 @@ const INTENSITY: { value: WorkoutIntensity; label: string }[] = [
 const DURATION_PRESETS = [15, 30, 45, 60];
 
 const FIELD =
-  "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base " +
+  "w-full rounded-lg border border-border-strong bg-background px-3 py-2.5 text-base " +
   "placeholder:text-muted focus:border-brand-500";
 
 function nowLocalInput(): string {
@@ -115,7 +115,7 @@ export function WorkoutForm({
         <button
           type="button"
           onClick={() => setCustom((prev) => !prev)}
-          className="text-xs text-brand-600 hover:underline"
+          className="text-xs text-brand-text hover:underline"
         >
           {custom ? "목록에서 선택하기" : "목록에 없나요? 직접 입력"}
         </button>
@@ -140,7 +140,7 @@ export function WorkoutForm({
               aria-pressed={duration === preset}
               className={`tabular flex-1 rounded-lg border py-2 text-sm transition-colors ${
                 duration === preset
-                  ? "border-brand-500 bg-brand-50 font-medium text-brand-800"
+                  ? "border-brand-500 bg-brand-soft font-medium text-brand-strong"
                   : "border-border text-muted hover:bg-surface"
               }`}
             >
@@ -168,8 +168,8 @@ export function WorkoutForm({
               key={option.value}
               className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border
                          border-border py-2.5 text-sm transition-colors
-                         has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50
-                         has-[:checked]:font-medium has-[:checked]:text-brand-800"
+                         has-[:checked]:border-brand-500 has-[:checked]:bg-brand-soft
+                         has-[:checked]:font-medium has-[:checked]:text-brand-strong"
             >
               <input
                 type="radio"

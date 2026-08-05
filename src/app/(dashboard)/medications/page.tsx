@@ -156,7 +156,7 @@ export default async function MedicationsPage() {
                     <input type="hidden" name="id" value={medication.id} />
                     <button
                       type="submit"
-                      className="shrink-0 rounded-lg border border-border px-2.5 py-1.5 text-xs
+                      className="shrink-0 rounded-lg border border-border-strong px-2.5 py-1.5 text-xs
                                  text-muted transition-colors hover:bg-surface hover:text-foreground"
                     >
                       {medication.is_active ? "중지" : "재개"}

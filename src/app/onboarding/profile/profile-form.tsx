@@ -39,7 +39,7 @@ export function ProfileForm({ initial }: Props) {
           defaultValue={initial.display_name}
           maxLength={40}
           placeholder="앱에서 표시될 이름"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base
+          className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5 text-base
                      placeholder:text-muted focus:border-brand-500"
         />
       </div>
@@ -58,7 +58,7 @@ export function ProfileForm({ initial }: Props) {
           max={new Date().getFullYear()}
           placeholder="1990"
           aria-describedby="birth_year-hint"
-          className="tabular w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="tabular w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-base placeholder:text-muted focus:border-brand-500"
         />
         <p id="birth_year-hint" className="text-xs text-muted">
@@ -73,9 +73,9 @@ export function ProfileForm({ initial }: Props) {
             <label
               key={option.value}
               className="flex flex-1 cursor-pointer items-center justify-center gap-2
-                         rounded-lg border border-border px-3 py-2.5 text-sm
-                         has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50
-                         has-[:checked]:font-medium has-[:checked]:text-brand-800"
+                         rounded-lg border border-border-strong px-3 py-2.5 text-sm
+                         has-[:checked]:border-brand-500 has-[:checked]:bg-brand-soft
+                         has-[:checked]:font-medium has-[:checked]:text-brand-strong"
             >
               <input
                 type="radio"
@@ -108,7 +108,7 @@ export function ProfileForm({ initial }: Props) {
           max={280}
           placeholder="170"
           aria-describedby="height-hint"
-          className="tabular w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="tabular w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-base placeholder:text-muted focus:border-brand-500"
         />
         <p id="height-hint" className="text-xs text-muted">

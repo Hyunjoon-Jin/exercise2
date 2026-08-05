@@ -23,23 +23,42 @@
   --color-brand-800: #115e59;
   --color-brand-900: #134e4a;
 
-  /* 지표 상태 */
-  --color-status-normal: #059669;
-  --color-status-caution: #d97706;
-  --color-status-out: #dc2626;
-  --color-status-unknown: #6b7280;
-
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard",
     "Noto Sans KR", "Malgun Gothic", sans-serif;
 }
 
+/* -----------------------------------------------------------------------------
+   테마별 색
+
+   같은 색값이 밝은 배경과 어두운 배경에서 동시에 WCAG AA(4.5:1)를 넘길 수는
+   없다. 상태색과 링크색을 테마마다 다르게 두고, 화면에서는 의미 이름만 쓴다.
+   (검증: scripts/check-contrast.mjs — npm run a11y:contrast)
+   ----------------------------------------------------------------------------- */
+
 :root {
   --background: #ffffff;
   --surface: #f8fafc;
+  /* 카드 외곽선·구분선. 장식이라 대비 기준의 대상이 아니다. */
   --border: #e2e8f0;
+  /* 입력·선택·보조 버튼의 테두리. 컨트롤의 경계를 알아볼 수 있어야 하므로
+     WCAG 1.4.11 비텍스트 대비 3:1 을 지킨다. */
+  --border-strong: #7d8796;
   --foreground: #0f172a;
-  --muted: #64748b;
+  /* #64748b 은 --surface 위에서 4.55:1 로 아슬아슬했다. 12px 보조 텍스트에
+     주로 쓰이므로 여유를 두고 어둡게 잡는다. */
+  --muted: #556270;
+
+  --status-normal: #047857;
+  --status-caution: #b45309;
+  --status-out: #b91c1c;
+  --status-unknown: #52606d;
+
+  /* 링크·강조 텍스트. brand-600 은 흰 배경에서 3.74:1 로 AA 에 못 미친다. */
+  --brand-text: #0f766e;
+  /* 선택된 항목의 바탕과 그 위 글자 */
+  --brand-soft: #f0fdfa;
+  --brand-strong: #115e59;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,8 +66,18 @@
     --background: #0b1120;
     --surface: #111827;
     --border: #1f2937;
+    --border-strong: #64748b;
     --foreground: #e2e8f0;
     --muted: #94a3b8;
+
+    --status-normal: #34d399;
+    --status-caution: #fbbf24;
+    --status-out: #f87171;
+    --status-unknown: #9ca3af;
+
+    --brand-text: #5eead4;
+    --brand-soft: #134e4a;
+    --brand-strong: #99f6e4;
   }
 }
 
@@ -56,8 +85,18 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+
+  --color-status-normal: var(--status-normal);
+  --color-status-caution: var(--status-caution);
+  --color-status-out: var(--status-out);
+  --color-status-unknown: var(--status-unknown);
+
+  --color-brand-text: var(--brand-text);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-strong: var(--brand-strong);
 }
 
 body {
@@ -72,8 +111,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* 키보드 사용자에게만 포커스 링을 보인다 */
+/* 키보드 사용자에게만 포커스 링을 보인다.
+   brand-500 은 흰 배경에서 2.49:1 이라 포커스 표시 기준(3:1)에 못 미친다.
+   테마별로 값이 갈리는 --brand-text 를 쓴다. */
 :focus-visible {
-  outline: 2px solid var(--color-brand-500);
+  outline: 2px solid var(--brand-text);
   outline-offset: 2px;
+}
+
+/* 움직임에 민감한 사용자를 위해 전환 효과를 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

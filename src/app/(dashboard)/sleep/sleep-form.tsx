@@ -65,7 +65,7 @@ export function SleepForm({ initialQuality = 3 }: { initialQuality?: number }) {
           name="sleep_date"
           type="date"
           required
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-base focus:border-brand-500"
         />
       </div>
@@ -82,7 +82,7 @@ export function SleepForm({ initialQuality = 3 }: { initialQuality?: number }) {
             value={bed}
             onChange={(e) => setBed(e.target.value)}
             required
-            className="tabular w-full rounded-lg border border-border bg-background px-3 py-2.5
+            className="tabular w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                        text-base focus:border-brand-500"
           />
         </div>
@@ -97,7 +97,7 @@ export function SleepForm({ initialQuality = 3 }: { initialQuality?: number }) {
             value={wake}
             onChange={(e) => setWake(e.target.value)}
             required
-            className="tabular w-full rounded-lg border border-border bg-background px-3 py-2.5
+            className="tabular w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                        text-base focus:border-brand-500"
           />
         </div>
@@ -124,7 +124,7 @@ export function SleepForm({ initialQuality = 3 }: { initialQuality?: number }) {
                 aria-pressed={active}
                 className={`flex-1 rounded-lg border px-1 py-2 text-xs transition-colors ${
                   active
-                    ? "border-brand-500 bg-brand-50 font-medium text-brand-800"
+                    ? "border-brand-500 bg-brand-soft font-medium text-brand-strong"
                     : "border-border text-muted hover:bg-surface"
                 }`}
               >

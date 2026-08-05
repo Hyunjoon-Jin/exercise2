@@ -28,7 +28,7 @@ const DAYS = [
 ];
 
 const FIELD_CLASS =
-  "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-base " +
+  "w-full rounded-lg border border-border-strong bg-background px-3 py-2.5 text-base " +
   "placeholder:text-muted focus:border-brand-500";
 
 export function MedicationForm() {
@@ -122,7 +122,7 @@ export function MedicationForm() {
                 <button
                   type="button"
                   onClick={() => setTimes((prev) => prev.filter((_, i) => i !== index))}
-                  className="shrink-0 rounded-lg border border-border px-3 text-sm text-muted
+                  className="shrink-0 rounded-lg border border-border-strong px-3 text-sm text-muted
                              transition-colors hover:bg-surface"
                 >
                   삭제
@@ -168,8 +168,8 @@ export function MedicationForm() {
                 key={day.value}
                 className="flex flex-1 cursor-pointer items-center justify-center rounded-lg
                            border border-border py-2 text-sm transition-colors
-                           has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50
-                           has-[:checked]:font-medium has-[:checked]:text-brand-800"
+                           has-[:checked]:border-brand-500 has-[:checked]:bg-brand-soft
+                           has-[:checked]:font-medium has-[:checked]:text-brand-strong"
               >
                 <input type="checkbox" name="days" value={day.value} className="sr-only" />
                 {day.label}

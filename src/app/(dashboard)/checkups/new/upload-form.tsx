@@ -41,7 +41,7 @@ export function UploadForm() {
           name="checkup_date"
           type="date"
           required
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-base focus:border-brand-500"
         />
         <p className="text-xs text-muted">
@@ -59,7 +59,7 @@ export function UploadForm() {
           type="text"
           maxLength={100}
           placeholder="○○병원 건강검진센터"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-base focus:border-brand-500"
         />
       </div>
@@ -75,7 +75,7 @@ export function UploadForm() {
           required
           accept="application/pdf,image/jpeg,image/png,image/webp"
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5
+          className="w-full rounded-lg border border-border-strong bg-background px-3 py-2.5
                      text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface
                      file:px-3 file:py-1.5 file:text-sm file:font-medium
                      focus:border-brand-500"

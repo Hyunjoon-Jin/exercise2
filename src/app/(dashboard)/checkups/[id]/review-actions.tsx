@@ -46,7 +46,7 @@ export function ReviewActions({
           <input type="hidden" name="checkup_id" value={checkupId} />
           <button
             type="submit"
-            className="w-full rounded-lg border border-border px-4 py-2 text-sm
+            className="w-full rounded-lg border border-border-strong px-4 py-2 text-sm
                        transition-colors hover:bg-surface"
           >
             남은 {pendingCount}개를 읽은 그대로 확인
@@ -97,7 +97,7 @@ export function RevertButton({
       <input type="hidden" name="checkup_id" value={checkupId} />
       <button
         type="submit"
-        className="rounded-lg border border-border px-3 py-1.5 text-sm text-muted
+        className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-muted
                    transition-colors hover:bg-surface"
       >
         반영 취소

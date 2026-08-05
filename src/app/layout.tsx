@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
+import { ServiceWorkerRegistrar } from "@/components/service-worker";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,6 +14,18 @@ export const metadata: Metadata = {
   applicationName: "건강기록",
   // 검색엔진 노출은 서비스 오픈 시점에 결정한다. 그때까지는 색인 금지.
   robots: { index: false, follow: false },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "건강기록",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
@@ -28,7 +42,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <ServiceWorkerRegistrar />
+      </body>
     </html>
   );
 }

@@ -57,7 +57,7 @@ function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-muted">
         계정이 없으신가요?{" "}
-        <Link href="/signup" className="font-medium text-brand-600 hover:underline">
+        <Link href="/signup" className="font-medium text-brand-text hover:underline">
           가입하기
         </Link>
       </p>
