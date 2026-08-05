@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { DeleteRecordButton } from "@/components/delete-record-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteSleep } from "./actions";
@@ -114,16 +115,11 @@ export default async function SleepPage() {
                   </p>
                 </div>
 
-                <form action={deleteSleep}>
-                  <input type="hidden" name="id" value={record.id} />
-                  <button
-                    type="submit"
-                    className="shrink-0 rounded-lg px-2 py-1 text-xs text-muted
-                               transition-colors hover:bg-surface hover:text-status-out"
-                  >
-                    삭제
-                  </button>
-                </form>
+                <DeleteRecordButton
+                  action={deleteSleep}
+                  fields={{ id: record.id }}
+                  what={`${record.sleep_date} 수면 기록`}
+                />
               </li>
             ))}
           </ul>

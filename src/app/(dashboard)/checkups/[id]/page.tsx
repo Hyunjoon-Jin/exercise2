@@ -110,10 +110,17 @@ export default async function CheckupDetailPage({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        {/* 원본 — 판독 결과를 대조할 기준. 화면이 넓으면 나란히 둔다. */}
-        <section className="lg:sticky lg:top-6 lg:self-start">
-          <h2 className="text-sm font-semibold">원본</h2>
+      {/* 모바일에서는 grid 를 쓰지 않는다. 각 칸이 별도 컨테이닝 블록이 되어
+          원본의 sticky 가 자기 칸 안에서만 움직이고, 목록을 스크롤하면
+          원본이 화면 밖으로 사라진다 — 대조가 불가능해진다. */}
+      <div className="mt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
+        {/* 원본 — 판독 결과를 대조할 기준. 목록을 훑는 동안 계속 붙어 있어야 한다. */}
+        <section
+          className="sticky top-0 z-20 -mx-4 border-b border-border bg-background px-4 pb-3 pt-1
+                     md:-mx-8 md:px-8
+                     lg:top-6 lg:z-0 lg:mx-0 lg:self-start lg:border-0 lg:px-0 lg:pb-0"
+        >
+          <h2 className="pt-2 text-sm font-semibold lg:pt-0">원본</h2>
 
           {signed?.signedUrl ? (
             <div className="mt-2 overflow-hidden rounded-xl border border-border">
@@ -121,7 +128,7 @@ export default async function CheckupDetailPage({
                 <iframe
                   src={signed.signedUrl}
                   title="검진 결과지 원본"
-                  className="h-[60vh] w-full lg:h-[70vh]"
+                  className="h-[24vh] w-full lg:h-[70vh]"
                 />
               ) : (
                 // 원본은 Storage 의 signed URL 이라 next/image 의 최적화 대상이 아니다.
@@ -129,7 +136,7 @@ export default async function CheckupDetailPage({
                 <img
                   src={signed.signedUrl}
                   alt="검진 결과지 원본"
-                  className="w-full"
+                  className="max-h-[24vh] w-full object-contain lg:max-h-none"
                 />
               )}
             </div>
@@ -140,11 +147,11 @@ export default async function CheckupDetailPage({
           )}
 
           {preview?.file_name ? (
-            <p className="mt-2 truncate text-xs text-muted">{preview.file_name}</p>
+            <p className="mt-2 hidden truncate text-xs text-muted lg:block">{preview.file_name}</p>
           ) : null}
         </section>
 
-        <section>
+        <section className="mt-6 lg:mt-0">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold">읽어낸 항목</h2>
             {confirmed && extraction ? (

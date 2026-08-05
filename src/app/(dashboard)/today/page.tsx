@@ -122,7 +122,11 @@ export default async function TodayPage() {
         <section className="mt-6 rounded-xl border border-border p-5">
           <div className="flex items-baseline justify-between">
             <h2 className="text-sm font-semibold">오늘 복약</h2>
-            <Link href="/medications" className="text-xs text-brand-text hover:underline">
+            <Link
+                  href="/medications"
+                  aria-label="복약 기록하기"
+                  className="text-xs text-brand-text hover:underline"
+                >
               기록하기
             </Link>
           </div>
@@ -173,7 +177,11 @@ export default async function TodayPage() {
             <div className="rounded-xl border border-border p-5">
               <div className="flex items-baseline justify-between">
                 <h2 className="text-sm font-semibold">오늘 섭취</h2>
-                <Link href="/meals" className="text-xs text-brand-text hover:underline">
+                <Link
+                  href="/meals"
+                  aria-label="식단 기록하기"
+                  className="text-xs text-brand-text hover:underline"
+                >
                   기록하기
                 </Link>
               </div>
@@ -193,7 +201,11 @@ export default async function TodayPage() {
             <div className="rounded-xl border border-border p-5">
               <div className="flex items-baseline justify-between">
                 <h2 className="text-sm font-semibold">이번 주 운동</h2>
-                <Link href="/workouts" className="text-xs text-brand-text hover:underline">
+                <Link
+                  href="/workouts"
+                  aria-label="운동 기록하기"
+                  className="text-xs text-brand-text hover:underline"
+                >
                   기록하기
                 </Link>
               </div>
@@ -218,7 +230,11 @@ export default async function TodayPage() {
         <section className="mt-6 rounded-xl border border-border p-5">
           <div className="flex items-baseline justify-between">
             <h2 className="text-sm font-semibold">가장 최근 수면</h2>
-            <Link href="/sleep" className="text-xs text-brand-text hover:underline">
+            <Link
+                  href="/sleep"
+                  aria-label="수면 기록하기"
+                  className="text-xs text-brand-text hover:underline"
+                >
               기록하기
             </Link>
           </div>

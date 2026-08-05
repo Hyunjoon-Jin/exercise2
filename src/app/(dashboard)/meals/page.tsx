@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { DeleteRecordButton } from "@/components/delete-record-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteMeal } from "./actions";
@@ -143,16 +144,13 @@ export default async function MealsPage() {
                           </p>
                           <div className="flex shrink-0 items-center gap-3">
                             <span className="tabular text-sm">{Math.round(kcal)}kcal</span>
-                            <form action={deleteMeal}>
-                              <input type="hidden" name="id" value={meal.id} />
-                              <button
-                                type="submit"
-                                className="rounded-lg px-2 py-1 text-xs text-muted
-                                           transition-colors hover:bg-surface hover:text-status-out"
-                              >
-                                삭제
-                              </button>
-                            </form>
+                            <DeleteRecordButton
+                              action={deleteMeal}
+                              fields={{ id: meal.id }}
+                              what={`${DATE_FMT.format(new Date(meal.eaten_at))} ${
+                                MEAL_LABEL[meal.meal_type] ?? meal.meal_type
+                              } 기록`}
+                            />
                           </div>
                         </div>
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { DeleteRecordButton } from "@/components/delete-record-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteWorkout } from "./actions";
@@ -164,16 +165,11 @@ export default async function WorkoutsPage() {
                   </p>
                 </div>
 
-                <form action={deleteWorkout}>
-                  <input type="hidden" name="id" value={workout.id} />
-                  <button
-                    type="submit"
-                    className="shrink-0 rounded-lg px-2 py-1 text-xs text-muted
-                               transition-colors hover:bg-surface hover:text-status-out"
-                  >
-                    삭제
-                  </button>
-                </form>
+                <DeleteRecordButton
+                  action={deleteWorkout}
+                  fields={{ id: workout.id }}
+                  what={`${workout.custom_name ?? "운동"} 기록`}
+                />
               </li>
             ))}
           </ul>

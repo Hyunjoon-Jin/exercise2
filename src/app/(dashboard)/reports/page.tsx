@@ -69,7 +69,11 @@ function Card({
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="text-sm font-semibold">{title}</h3>
         {href ? (
-          <Link href={href as Route} className="text-xs text-brand-text hover:underline">
+          <Link
+            href={href as Route}
+            aria-label={`${title} 자세히 보기`}
+            className="text-xs text-brand-text hover:underline"
+          >
             보기
           </Link>
         ) : null}

@@ -104,9 +104,24 @@ export function MetricChart({ points, unit, decimalPlaces, range }: Props) {
 
   const hasCheckup = points.some((p) => p.source === "checkup");
 
+  // 그래프를 볼 수 없는 사용자에게 "지표 추세 그래프"는 아무것도 알려주지
+  // 않는다. 기간·시작값·끝값·범위를 문장으로 만들어 준다. 상세 화면에는
+  // 아래에 기록 내역 표가 따로 있으므로 여기서는 요약이면 충분하다.
+  const first = points[0];
+  const last = points[points.length - 1];
+  const summary =
+    points.length === 1
+      ? `${DATE_FMT.format(new Date(first.t))} ${first.value.toFixed(decimalPlaces)} ${unit} 한 건`
+      : `${DATE_FMT.format(new Date(first.t))}부터 ${DATE_FMT.format(new Date(last.t))}까지 ` +
+        `${points.length}건. ${first.value.toFixed(decimalPlaces)}에서 ` +
+        `${last.value.toFixed(decimalPlaces)} ${unit} 로 변했고, ` +
+        `가장 낮은 값 ${Math.min(...values).toFixed(decimalPlaces)}, ` +
+        `가장 높은 값 ${Math.max(...values).toFixed(decimalPlaces)}.` +
+        (range ? ` 참고범위 ${bandLow}–${bandHigh} ${unit}.` : "");
+
   return (
     <>
-      <div className="h-56 w-full" role="img" aria-label="지표 추세 그래프">
+      <div className="h-56 w-full" role="img" aria-label={`지표 추세 그래프. ${summary}`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />

@@ -11,6 +11,7 @@ import {
   formatMetricValue,
   formatReferenceRange,
 } from "@/lib/metrics/status";
+import { DeleteRecordButton } from "@/components/delete-record-button";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteMetric } from "../actions";
@@ -162,17 +163,13 @@ export default async function MetricDetailPage({
                 </div>
 
                 {record.source === "self" ? (
-                  <form action={deleteMetric}>
-                    <input type="hidden" name="id" value={record.id} />
-                    <input type="hidden" name="metric_code" value={definition.code} />
-                    <button
-                      type="submit"
-                      className="shrink-0 rounded-lg px-2 py-1 text-xs text-muted
-                                 transition-colors hover:bg-surface hover:text-status-out"
-                    >
-                      삭제
-                    </button>
-                  </form>
+                  <DeleteRecordButton
+                    action={deleteMetric}
+                    fields={{ id: record.id, metric_code: definition.code }}
+                    what={`${DATETIME.format(new Date(record.measured_at))} ${
+                      definition.display_name
+                    } ${formatMetricValue(record.value, definition)}${definition.unit}`}
+                  />
                 ) : null}
               </li>
             ))}

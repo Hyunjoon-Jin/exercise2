@@ -32,7 +32,7 @@ export function ReviewActions({
   );
 
   return (
-    <div className="sticky bottom-4 mt-6 space-y-3 rounded-xl border border-border bg-background p-4 shadow-lg">
+    <div className="sticky bottom-20 mt-6 md:bottom-4 space-y-3 rounded-xl border border-border bg-background p-4 shadow-lg">
       <p className="text-sm">
         확인한 항목 <strong className="tabular font-semibold">{readyCount}</strong>개
         {pendingCount > 0 ? (
@@ -97,7 +97,7 @@ export function RevertButton({
       <input type="hidden" name="checkup_id" value={checkupId} />
       <button
         type="submit"
-        className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-muted
+        className="min-h-11 rounded-lg border border-border-strong px-3 text-sm text-muted
                    transition-colors hover:bg-surface"
       >
         반영 취소
@@ -136,8 +136,9 @@ export function DeleteCheckupButton({
       <input type="hidden" name="id" value={checkupId} />
       <button
         type="submit"
-        className="rounded-lg px-2 py-1 text-xs text-muted transition-colors
-                   hover:bg-surface hover:text-status-out"
+        aria-label="이 검진 기록 삭제"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2
+                   text-xs text-muted transition-colors hover:bg-surface hover:text-status-out"
       >
         삭제
       </button>
