@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test \"src/**/*.test.ts\"",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "food:check": "node scripts/check-food-api.mjs",
+    "food:check": "node scripts/check-food-api.ts",
     "db:push": "supabase db push",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --linked > src/lib/db/types.generated.ts"
