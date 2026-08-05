@@ -96,9 +96,11 @@ export default async function SettingsPage() {
           })}
         </ul>
         <p className="mt-2 text-xs leading-relaxed text-muted">
-          동의와 철회는 덮어쓰지 않고 이력으로 쌓입니다. 언제 동의했고 언제 철회했는지가
-          남아야 나중에 확인할 수 있기 때문입니다. 계정을 삭제하면 이 이력도 함께
-          사라집니다.
+          동의와 철회는 덮어쓰지 않고 이력으로 쌓입니다. 계정을 삭제하면 이 이력도
+          함께 사라집니다.{" "}
+          <Link href="/settings/consent-history" className="text-brand-text hover:underline">
+            내 동의 이력 보기
+          </Link>
         </p>
       </section>
 
@@ -108,6 +110,7 @@ export default async function SettingsPage() {
           {[
             { href: "/legal/terms", label: "서비스 이용약관" },
             { href: "/legal/privacy", label: "개인정보 처리방침" },
+            { href: "/legal/history", label: "약관 개정 이력" },
           ].map((item) => (
             <li key={item.href}>
               <Link

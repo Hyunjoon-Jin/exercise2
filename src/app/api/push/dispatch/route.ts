@@ -18,6 +18,7 @@ interface DueReminder {
   dosage_unit: string | null;
   schedule_id: string;
   scheduled_for: string;
+  show_medication_name: boolean;
 }
 
 /**
@@ -66,9 +67,16 @@ export async function POST(request: NextRequest) {
       ? ` ${reminder.dosage_amount}${reminder.dosage_unit ?? ""}`
       : "";
 
+    // 페이로드는 종단간 암호화되어 푸시 사업자는 읽지 못하지만, 기기
+    // 잠금화면에는 그대로 뜬다. 복용 중인 약은 질병을 추론하게 하므로
+    // 사용자가 켜지 않았으면 이름을 넣지 않는다 (기본값 꺼짐).
+    const body = reminder.show_medication_name
+      ? `${reminder.medication_name}${dosage}`
+      : "앱을 열어 확인해 주세요.";
+
     const payload = JSON.stringify({
       title: "복약 시간입니다",
-      body: `${reminder.medication_name}${dosage}`,
+      body,
       tag: `medication-${reminder.schedule_id}`,
       url: "/medications",
     });

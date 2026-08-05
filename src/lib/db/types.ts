@@ -78,6 +78,7 @@ export interface Database {
           sex: BiologicalSex;
           height_cm: number | null;
           timezone: string;
+          show_medication_name_in_push: boolean;
           weekly_exercise_goal_min: number | null;
           onboarded_at: string | null;
           created_at: string;
@@ -99,6 +100,7 @@ export interface Database {
           height_cm?: number | null;
           timezone?: string;
           weekly_exercise_goal_min?: number | null;
+          show_medication_name_in_push?: boolean;
           onboarded_at?: string | null;
         };
         Relationships: [];
@@ -746,6 +748,7 @@ export interface Database {
           dosage_unit: string | null;
           schedule_id: string;
           scheduled_for: string;
+          show_medication_name: boolean;
         }[];
       };
       mark_push_failure: {

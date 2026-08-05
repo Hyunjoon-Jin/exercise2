@@ -200,3 +200,22 @@ export async function clearDose(formData: FormData): Promise<void> {
   revalidatePath("/medications");
   revalidatePath("/today");
 }
+
+/**
+ * 알림에 약 이름을 넣을지 바꾼다.
+ *
+ * 기본값은 꺼짐이다. 알림을 켜는 것과 잠금화면에 약 이름이 뜨는 것에 함께
+ * 동의했다고 볼 수 없고, 한 번 노출된 것은 되돌릴 수 없기 때문이다.
+ */
+export async function setShowMedicationName(formData: FormData): Promise<void> {
+  const { supabase, user } = await requireUser();
+
+  const show = readString(formData, "show") === "1";
+
+  await supabase
+    .from("profiles")
+    .update({ show_medication_name_in_push: show })
+    .eq("id", user.id);
+
+  revalidatePath("/medications");
+}
