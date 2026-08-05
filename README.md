@@ -6,16 +6,20 @@
 
 ---
 
-## 현재 상태 — Phase 2 완료
+## 현재 상태 — Phase 0~5 완료
 
 | Phase | 내용 | 상태 |
 |---|---|---|
 | Phase 0 | 프로젝트 셋업 · 인증 · 동의 · 스키마 · RLS · 앱 셸 | ✅ 완료 |
 | Phase 1 | 신체기록 · 수면 · 복약 · 복약 알림 | ✅ 완료 |
-| **Phase 2** | 식단 · 운동 | ✅ 완료 |
-| Phase 3 | 검진 결과지 자동 판독 | 예정 |
-| Phase 4 | 대시보드 · 주간 리포트 | 예정 |
-| Phase 5 | PWA · 접근성 · 약관 · 탈퇴 절차 | 예정 |
+| Phase 2 | 식단 · 운동 | ✅ 완료 |
+| Phase 3 | 검진 결과지 자동 판독 · 검수 UI | ✅ 완료 |
+| Phase 4 | 대시보드 · 주간 리포트 · 통합 그래프 | ✅ 완료 |
+| Phase 5 | PWA · 접근성 · 약관 · 탈퇴 절차 | ✅ 완료 |
+
+기능 구현은 끝났지만 **이대로 서비스를 열 수는 없습니다.** 약관 다섯 건이
+아직 법률 검토 전이고, 배치 등록과 환경변수가 남아 있습니다 —
+[`docs/RELEASE.md`](docs/RELEASE.md) 를 먼저 읽어 주세요.
 
 ---
 
@@ -24,7 +28,7 @@
 - **Next.js 16** (App Router) + TypeScript
 - **Tailwind CSS v4**
 - **Supabase** — Postgres + Auth + Storage, RLS로 사용자 격리
-- **Claude API** (`claude-opus-5`) — 검진 결과지 판독 (Phase 3)
+- **Claude API** (`claude-opus-5`) — 검진 결과지 판독 (Structured Outputs)
 
 ---
 
@@ -63,14 +67,37 @@ npm run dev
 ### 4. 검증
 
 ```bash
-npm run check   # 타입 검사 + 린트 + 테스트
+npm run check   # 타입 검사 + 린트 + 테스트 + 명도대비
 npm run build   # 프로덕션 빌드
 ```
 
-테스트는 Node 내장 러너를 사용합니다(별도 의존성 없음). 지표 판정
-로직(`src/lib/metrics/status.ts`)의 경계값, 수면 시간 계산(자정 통과), 음식 API
-응답 파싱을 고정하고 있습니다. 특히 정상/주의/범위밖 판정이 조용히 바뀌면
-사용자에게 잘못된 신호를 주기 때문에 경계값을 명시적으로 박아 두었습니다.
+`typecheck` 는 `tsc` 앞에 `next typegen` 을 먼저 돌립니다. `PageProps` ·
+`LayoutProps` 는 Next 가 라우트 구조에서 생성하는 전역 타입이라, 빌드 산출물이
+없는 상태에서 `tsc` 만 돌리면 "Cannot find name 'PageProps'" 로 실패합니다.
+
+**Node 22.18 이상이 필요합니다.** 그 아래에서는 타입 스트리핑이 플래그 뒤에
+있어 `node --test` 가 `.ts` 파일을 실행하지 못하고, 테스트가 실패가 아니라
+"0개 통과"로 조용히 넘어갑니다.
+
+테스트는 Node 내장 러너를 사용합니다(별도 의존성 없음). 조용히 틀릴 수 있는
+곳만 고정합니다.
+
+| 대상 | 무엇을 막는가 |
+|---|---|
+| `lib/metrics/status.ts` | 정상/주의/범위밖 경계값. 바뀌면 사용자에게 잘못된 신호가 간다 |
+| `lib/sleep/window.ts` | 자정을 넘는 수면 시간 계산 |
+| `lib/food/mfds.ts` | 공공 API 응답 필드 별칭 · 이중 인코딩된 인증키 |
+| `lib/checkup/normalize.ts` | 목록에 없는 지표 코드, 값 없는 행 |
+| `lib/reports/format.ts` | 비교 대상이 없을 때 델타를 0 으로 취급하지 않는 것 |
+| `lib/supabase/paths.ts` | 접두사가 겹치는 경로로 인증·동의 게이트가 뚫리는 것 |
+
+`npm run a11y:contrast` 는 `globals.css` 의 토큰을 직접 읽어 WCAG AA 대비를
+계산합니다. 4.5:1 은 눈으로 판별되는 경계가 아니라서 자동으로 확인합니다.
+`npm run check` 에 포함되어 있습니다.
+
+CI(`.github/workflows/ci.yml`)는 위 검사에 더해 임시 Postgres 에 마이그레이션
+전체를 적용해 봅니다. 스키마는 타입 검사가 잡아 주지 않아, 문법 오류가
+배포 시점까지 살아남습니다.
 
 ---
 
@@ -82,14 +109,21 @@ src/
     (auth)/          로그인 · 가입
     onboarding/      동의 · 프로필 설정
     (dashboard)/     오늘 · 기록 · 식단 · 운동 · 복약 · 검진 · 리포트 · 설정
+    legal/           이용약관 · 개인정보 처리방침 (로그인 불필요)
+    offline/         오프라인 안내 (서비스 워커가 미리 받아 둠)
+    api/             검진 판독 · 푸시 발송 · Storage 정리
     auth/callback/   이메일 인증 · OAuth 리디렉션
+    manifest.ts      PWA 매니페스트
   components/        공용 UI
   lib/
-    supabase/        클라이언트(브라우저/서버) + 세션 갱신
+    supabase/        클라이언트(브라우저/서버) · 세션 갱신 · 경로 규칙
     db/types.ts      DB 타입
     metrics/         지표 상태 판정 · 참고범위
     food/            음식 검색 (로컬 캐시 우선) · 공공 API 클라이언트
     sleep/           수면 시간 계산
+    checkup/         결과지 판독 스키마 · 프롬프트 · 정규화
+    reports/         주간 리포트 계산
+    legal/           약관 문서 조회
     push/            웹 푸시 VAPID 설정
     nav.ts           내비게이션 정의
   proxy.ts           세션 갱신 + 접근 제어 + 동의 게이트
@@ -103,6 +137,8 @@ supabase/migrations/
   0005_phase1_records.sql           파생 지표 트리거 · 복약 스케줄 전개 · 푸시 구독
   0006_medication_reminders.sql     알림 발송 대상 조회 (스케줄러 전용)
   0007_phase2_diet_exercise.sql     영양·운동 집계 트리거 · 운동 마스터 · 음식 캐시
+  0008_phase3_checkup_review.sql    검진 확정·되돌리기 · Storage 정리 큐
+  0009_phase4_reports.sql           주간 집계 · 기간별 지표 변화
 ```
 
 음식 API 키 발급과 연결 확인은 [`docs/FOOD_API.md`](docs/FOOD_API.md) 참고.
@@ -176,3 +212,25 @@ RLS 를 켜고 정책을 잊으면 데이터가 새는 게 아니라 접근이 �
 `supabase/migrations/0004_consent_functions.sql` 의 동의 문안은 **개발용 초안**입니다.
 서비스 오픈 전 법률 검토를 거쳐 정식 문안으로 교체하고 `version` 을 올려야 합니다.
 버전을 올리면 기존 동의가 자동으로 무효가 되어 재동의 화면이 뜹니다.
+
+### 서비스 워커 캐시
+
+`public/sw.js` 가 캐시하는 것은 **오프라인 안내 페이지와 `/_next/static` 뿐**입니다.
+화면 HTML, RSC 페이로드, API 응답은 절대 넣지 마세요. 거기에는 복약 이력과
+검진 수치가 실려 있고, 서비스 워커 캐시는 오리진 단위로 디스크에 남아
+로그아웃한 뒤에도 지워지지 않습니다.
+
+오프라인 임시 저장(나중에 동기화)도 의도적으로 넣지 않았습니다. 복약 체크가
+서버에 닿지 않았는데 "저장됨"으로 보이면, 사용자는 먹었다고 믿고 다시 먹지
+않습니다.
+
+### 탈퇴
+
+`auth.users` 행 하나가 지워지면 `public` 스키마의 모든 사용자 데이터가
+cascade 로 함께 사라집니다. **새 테이블을 만들 때 `on delete cascade` 를
+빠뜨리면 그 테이블만 탈퇴 후에도 남습니다.**
+
+Storage 객체는 cascade 대상이 아닙니다. `checkup_documents` 삭제 트리거가
+`storage_cleanup_queue` 에 경로를 남기고, `POST /api/storage/cleanup` 배치가
+실제 파일을 지웁니다. **이 배치를 등록하지 않으면 파기했다고 표시된 파일이
+실제로는 남습니다.**

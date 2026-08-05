@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 같은 브랜치에 연달아 푸시하면 앞선 실행을 취소한다.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          # 22.18 미만에서는 타입 스트리핑이 플래그 뒤에 있어 `node --test`가
+          # .ts 파일을 실행하지 못한다. 테스트가 "0개 통과"로 조용히 넘어간다.
+          node-version: "22.x"
+          cache: npm
+
+      - run: npm ci
+
+      # 타입 · 린트 · 테스트 · 명도대비를 한 번에 (package.json 의 check)
+      - run: npm run check
+
+      # 빌드에는 Supabase 접속 정보가 필요 없다. env 는 요청 시점에 읽고,
+      # 정적 생성되는 화면(/login, /signup, /offline)은 DB 를 건드리지 않는다.
+      # 여기서 깨지면 그 전제가 무너진 것이므로 그 자체가 신호다.
+      - run: npm run build
+
+  migrations:
+    runs-on: ubuntu-latest
+
+    # 마이그레이션이 실제로 적용되는지 확인한다. 스키마는 앱 코드와 달리
+    # 타입 검사가 잡아 주지 않아, 문법 오류가 배포 시점까지 살아남는다.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Supabase 스텁 생성
+        # 실제 Supabase 의 auth/storage 스키마를 최소한으로 흉내낸다.
+        # 마이그레이션이 참조하는 것만 만든다.
+        run: |
+          cat > /tmp/stubs.sql <<'SQL'
+          create role anon nologin;
+          create role authenticated nologin;
+          create role service_role nologin;
+
+          create schema auth;
+          create schema storage;
+
+          create table auth.users (
+            id uuid primary key default gen_random_uuid(),
+            email text,
+            raw_user_meta_data jsonb default '{}'::jsonb
+          );
+
+          create or replace function auth.uid() returns uuid
+          language sql stable as $$
+            select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+          $$;
+
+          create table storage.buckets (
+            id text primary key,
+            name text not null,
+            public boolean default false,
+            file_size_limit bigint,
+            allowed_mime_types text[]
+          );
+
+          create table storage.objects (
+            id uuid primary key default gen_random_uuid(),
+            bucket_id text references storage.buckets (id),
+            name text
+          );
+
+          create or replace function storage.foldername(name text) returns text[]
+          language sql immutable as $$
+            select string_to_array(name, '/');
+          $$;
+          SQL
+
+      - name: 마이그레이션 적용
+        env:
+          PGPASSWORD: postgres
+        run: |
+          # psql 실패가 "OK" 출력에 묻히지 않도록 명시한다. 이게 없으면
+          # 마이그레이션이 전부 깨져도 잡이 초록색으로 끝난다.
+          set -euo pipefail
+
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q \
+            -c "create database health;"
+          psql -h localhost -U postgres -d health -v ON_ERROR_STOP=1 -q \
+            -f /tmp/stubs.sql
+          for f in supabase/migrations/*.sql; do
+            printf '%-52s' "$(basename "$f")"
+            psql -h localhost -U postgres -d health -v ON_ERROR_STOP=1 -q -f "$f" \
+              && echo "OK"
+          done
