@@ -14,6 +14,19 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   rejected: { label: "제외함", className: "bg-surface text-muted" },
 };
 
+/**
+ * 결과지에 인쇄된 값에서 숫자를 꺼낸다.
+ *
+ * "92", "1,234", "5.4" 처럼 깨끗한 숫자만 받는다. "2O4"(숫자 0 이 아니라 알파벳
+ * O 로 읽힌 경우)나 "<5" 는 일부러 비워 둔다 — 건강 수치를 추측해서 채우면
+ * 사용자가 그 값을 확인했다고 믿고 넘어간다.
+ */
+function numericHint(raw: string | null): string {
+  if (!raw) return "";
+  const cleaned = raw.replace(/,/g, "").trim();
+  return /^-?\d+(\.\d+)?$/.test(cleaned) ? cleaned : "";
+}
+
 /** confidence 를 백분율 문구로. 숫자를 그대로 보이면 정밀해 보이는 착시가 생긴다. */
 function confidenceNote(confidence: number | null): string | null {
   if (confidence === null) return null;
@@ -39,7 +52,9 @@ export function ItemRow({
     EMPTY_FORM_STATE,
   );
   const [code, setCode] = useState(item.metric_code ?? "");
-  const [value, setValue] = useState(item.value === null ? "" : String(item.value));
+  const [value, setValue] = useState(
+    item.value === null ? numericHint(item.raw_value) : String(item.value),
+  );
 
   const definition = definitions.find((d) => d.code === code);
   const badge = STATUS_BADGE[item.status] ?? STATUS_BADGE.pending;
@@ -84,7 +99,26 @@ export function ItemRow({
         <p className="mt-2 text-xs text-status-caution">{note}. 원본을 확인해 주세요.</p>
       ) : null}
 
-      {locked ? (
+      {item.status === "rejected" ? (
+        // 이미 제외한 항목이다. 입력칸을 남겨 두면 결정이 끝난 줄에 계속
+        // 눈이 가고, 비활성 버튼만 자리를 차지한다.
+        <form action={formAction} className="mt-2">
+          <input type="hidden" name="id" value={item.id} />
+          <input type="hidden" name="checkup_id" value={checkupId} />
+          <input type="hidden" name="metric_code" value={item.metric_code ?? ""} />
+          <input type="hidden" name="value" value={item.value ?? ""} />
+          <button
+            type="submit"
+            disabled={pending || !item.metric_code || item.value === null}
+            className="min-h-11 rounded-lg px-2 text-xs text-brand-text underline
+                       underline-offset-2 disabled:no-underline disabled:opacity-60"
+          >
+            {item.metric_code && item.value !== null
+              ? "다시 포함하기"
+              : "지표와 값이 없어 되돌릴 수 없습니다"}
+          </button>
+        </form>
+      ) : locked ? (
         <p className="tabular mt-2 text-sm">
           {definition ? `${definition.display_name} · ` : ""}
           {item.value ?? "—"} {item.unit ?? ""}
@@ -149,11 +183,20 @@ export function ItemRow({
             </p>
           ) : null}
 
+          {/* 비활성 버튼은 이유를 말해 주지 않으면 고장으로 읽힌다. */}
+          {!code || value === "" ? (
+            <p className="text-xs text-muted">
+              {!code
+                ? "어느 지표인지 고르면 기록할 수 있습니다."
+                : "값을 입력하면 기록할 수 있습니다."}
+            </p>
+          ) : null}
+
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={pending || !code || value === ""}
-              className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white
+              className="min-h-11 rounded-lg bg-brand-600 px-3 text-sm font-medium text-white
                          transition-colors hover:bg-brand-700 disabled:opacity-50"
             >
               {item.status === "pending" ? "확인" : "다시 저장"}
@@ -163,8 +206,9 @@ export function ItemRow({
               name="action"
               value="reject"
               formNoValidate
-              disabled={pending || item.status === "rejected"}
-              className="rounded-lg border border-border-strong px-3 py-1.5 text-sm text-muted
+              // 제외된 항목은 위에서 따로 그리므로 여기 올 수 없다.
+              disabled={pending}
+              className="min-h-11 rounded-lg border border-border-strong px-3 text-sm text-muted
                          transition-colors hover:bg-surface disabled:opacity-50"
             >
               제외
