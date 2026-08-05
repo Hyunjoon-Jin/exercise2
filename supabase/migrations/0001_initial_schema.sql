@@ -64,7 +64,9 @@ create type public.consent_kind as enum (
   'terms_of_service',      -- 이용약관 (필수)
   'privacy_policy',        -- 개인정보 처리방침 (필수)
   'sensitive_health_data', -- 건강정보=민감정보 별도 동의 (필수, 법정)
-  'llm_processing',        -- 검진 결과지 외부 LLM 처리 동의 (필수)
+  -- 검진 결과지 외부 LLM 처리 동의. 선택이다 — 거부해도 수치를 직접 입력해
+  -- 서비스를 그대로 쓸 수 있으므로 필수로 둘 근거가 없다 (0004 의 is_required).
+  'llm_processing',
   'marketing'              -- 마케팅 수신 (선택)
 );
 
