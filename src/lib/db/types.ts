@@ -49,6 +49,10 @@ export type MedicationForm =
 
 export type MedicationLogStatus = "taken" | "skipped" | "missed";
 
+export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
+
+export type WorkoutIntensity = "light" | "moderate" | "vigorous";
+
 /** medication_doses_for_date() 반환 행 — 스케줄에서 전개된 그 날의 예정 복용 */
 export interface MedicationDose {
   schedule_id: string;
@@ -74,6 +78,7 @@ export interface Database {
           sex: BiologicalSex;
           height_cm: number | null;
           timezone: string;
+          weekly_exercise_goal_min: number | null;
           onboarded_at: string | null;
           created_at: string;
           updated_at: string;
@@ -93,6 +98,7 @@ export interface Database {
           sex?: BiologicalSex;
           height_cm?: number | null;
           timezone?: string;
+          weekly_exercise_goal_min?: number | null;
           onboarded_at?: string | null;
         };
         Relationships: [];
@@ -342,6 +348,180 @@ export interface Database {
         Relationships: [];
       };
 
+      foods: {
+        Row: {
+          code: string;
+          name: string;
+          brand: string | null;
+          source: string;
+          serving_size: number;
+          serving_unit: string;
+          kcal: number | null;
+          carb_g: number | null;
+          protein_g: number | null;
+          fat_g: number | null;
+          sugar_g: number | null;
+          sodium_mg: number | null;
+          fiber_g: number | null;
+          search_text: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+
+      user_foods: {
+        Row: {
+          code: string;
+          user_id: string;
+          name: string;
+          brand: string | null;
+          serving_size: number;
+          serving_unit: string;
+          kcal: number | null;
+          carb_g: number | null;
+          protein_g: number | null;
+          fat_g: number | null;
+          sugar_g: number | null;
+          sodium_mg: number | null;
+          fiber_g: number | null;
+          use_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          code: string;
+          user_id: string;
+          name: string;
+          brand?: string | null;
+          serving_size?: number;
+          serving_unit?: string;
+          kcal?: number | null;
+          carb_g?: number | null;
+          protein_g?: number | null;
+          fat_g?: number | null;
+          sugar_g?: number | null;
+          sodium_mg?: number | null;
+          fiber_g?: number | null;
+        };
+        Update: {
+          name?: string;
+          use_count?: number;
+        };
+        Relationships: [];
+      };
+
+      meals: {
+        Row: {
+          id: string;
+          user_id: string;
+          meal_type: MealType;
+          eaten_at: string;
+          note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          meal_type: MealType;
+          eaten_at: string;
+          note?: string | null;
+        };
+        Update: { meal_type?: MealType; eaten_at?: string; note?: string | null };
+        Relationships: [];
+      };
+
+      meal_items: {
+        Row: {
+          id: string;
+          meal_id: string;
+          user_id: string;
+          food_code: string | null;
+          custom_name: string | null;
+          quantity: number;
+          unit: string;
+          kcal: number | null;
+          carb_g: number | null;
+          protein_g: number | null;
+          fat_g: number | null;
+          created_at: string;
+        };
+        Insert: {
+          meal_id: string;
+          user_id: string;
+          food_code?: string | null;
+          custom_name?: string | null;
+          quantity?: number;
+          unit?: string;
+          kcal?: number | null;
+          carb_g?: number | null;
+          protein_g?: number | null;
+          fat_g?: number | null;
+        };
+        Update: never;
+        // meals.select("*, meal_items(*)") 로 한 번에 읽으려면
+        // PostgREST 가 관계를 알아야 한다.
+        Relationships: [
+          {
+            foreignKeyName: "meal_items_meal_id_fkey";
+            columns: ["meal_id"];
+            isOneToOne: false;
+            referencedRelation: "meals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
+      exercises: {
+        Row: {
+          code: string;
+          name: string;
+          category: string;
+          met: number | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+
+      workouts: {
+        Row: {
+          id: string;
+          user_id: string;
+          exercise_code: string | null;
+          custom_name: string | null;
+          started_at: string;
+          duration_min: number;
+          intensity: WorkoutIntensity;
+          calories_burned: number | null;
+          distance_km: number | null;
+          note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          exercise_code?: string | null;
+          custom_name?: string | null;
+          started_at: string;
+          duration_min: number;
+          intensity?: WorkoutIntensity;
+          calories_burned?: number | null;
+          distance_km?: number | null;
+          note?: string | null;
+        };
+        Update: {
+          duration_min?: number;
+          intensity?: WorkoutIntensity;
+          calories_burned?: number | null;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
+
       push_subscriptions: {
         Row: {
           id: string;
@@ -432,6 +612,29 @@ export interface Database {
       mark_push_success: {
         Args: { subscription_endpoint: string };
         Returns: undefined;
+      };
+      cache_foods: {
+        Args: { items: Json };
+        Returns: number;
+      };
+      daily_nutrition_summary: {
+        Args: { target_date: string };
+        Returns: {
+          kcal: number;
+          carb_g: number;
+          protein_g: number;
+          fat_g: number;
+          meal_count: number;
+        }[];
+      };
+      weekly_exercise_summary: {
+        Args: Record<string, never>;
+        Returns: {
+          total_min: number;
+          total_calories: number;
+          session_count: number;
+          goal_min: number | null;
+        }[];
       };
     };
 

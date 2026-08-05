@@ -6,13 +6,13 @@
 
 ---
 
-## 현재 상태 — Phase 1 완료
+## 현재 상태 — Phase 2 완료
 
 | Phase | 내용 | 상태 |
 |---|---|---|
 | Phase 0 | 프로젝트 셋업 · 인증 · 동의 · 스키마 · RLS · 앱 셸 | ✅ 완료 |
-| **Phase 1** | 신체기록 · 수면 · 복약 · 복약 알림 | ✅ 완료 |
-| Phase 2 | 식단 · 운동 | 예정 |
+| Phase 1 | 신체기록 · 수면 · 복약 · 복약 알림 | ✅ 완료 |
+| **Phase 2** | 식단 · 운동 | ✅ 완료 |
 | Phase 3 | 검진 결과지 자동 판독 | 예정 |
 | Phase 4 | 대시보드 · 주간 리포트 | 예정 |
 | Phase 5 | PWA · 접근성 · 약관 · 탈퇴 절차 | 예정 |
@@ -40,7 +40,7 @@ supabase link --project-ref <your-project-ref>
 npm run db:push
 ```
 
-`supabase/migrations/` 의 4개 파일이 순서대로 적용됩니다.
+`supabase/migrations/` 의 파일이 번호 순으로 적용됩니다.
 
 ### 2. 환경변수
 
@@ -67,9 +67,10 @@ npm run check   # 타입 검사 + 린트 + 테스트
 npm run build   # 프로덕션 빌드
 ```
 
-테스트는 Node 내장 러너를 사용합니다(별도 의존성 없음). 현재는 지표 판정
-로직(`src/lib/metrics/status.ts`)의 경계값을 고정하고 있습니다 — 정상/주의/범위밖
-판정이 조용히 바뀌면 사용자에게 잘못된 신호를 주기 때문입니다.
+테스트는 Node 내장 러너를 사용합니다(별도 의존성 없음). 지표 판정
+로직(`src/lib/metrics/status.ts`)의 경계값, 수면 시간 계산(자정 통과), 음식 API
+응답 파싱을 고정하고 있습니다. 특히 정상/주의/범위밖 판정이 조용히 바뀌면
+사용자에게 잘못된 신호를 주기 때문에 경계값을 명시적으로 박아 두었습니다.
 
 ---
 
@@ -87,6 +88,9 @@ src/
     supabase/        클라이언트(브라우저/서버) + 세션 갱신
     db/types.ts      DB 타입
     metrics/         지표 상태 판정 · 참고범위
+    food/            음식 검색 (로컬 캐시 우선) · 공공 API 클라이언트
+    sleep/           수면 시간 계산
+    push/            웹 푸시 VAPID 설정
     nav.ts           내비게이션 정의
   proxy.ts           세션 갱신 + 접근 제어 + 동의 게이트
                      (Next 16 규약. 15 이전의 middleware.ts 에 해당)
@@ -98,7 +102,11 @@ supabase/migrations/
   0004_consent_functions.sql        동의 판정 함수 + 동의 문서 v1
   0005_phase1_records.sql           파생 지표 트리거 · 복약 스케줄 전개 · 푸시 구독
   0006_medication_reminders.sql     알림 발송 대상 조회 (스케줄러 전용)
+  0007_phase2_diet_exercise.sql     영양·운동 집계 트리거 · 운동 마스터 · 음식 캐시
 ```
+
+음식 API 키 발급과 연결 확인은 [`docs/FOOD_API.md`](docs/FOOD_API.md) 참고.
+키가 없어도 직접 입력으로 식단 기록은 정상 동작합니다.
 
 ## 복약 알림 설정
 

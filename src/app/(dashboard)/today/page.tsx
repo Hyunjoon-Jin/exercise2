@@ -37,24 +37,29 @@ export default async function TodayPage() {
   const timezone = profile?.timezone ?? "Asia/Seoul";
   const today = todayIn(timezone);
 
-  const [summaries, dosesResult, sleepResult] = await Promise.all([
-    getMetricSummaries({
-      sex: profile?.sex ?? "unspecified",
-      birth_year: profile?.birth_year ?? null,
-    }),
-    supabase.rpc("medication_doses_for_date", { target_date: today }),
-    supabase
-      .from("sleep_records")
-      .select("sleep_date, duration_min")
-      .order("sleep_date", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
+  const [summaries, dosesResult, sleepResult, nutritionResult, exerciseResult] =
+    await Promise.all([
+      getMetricSummaries({
+        sex: profile?.sex ?? "unspecified",
+        birth_year: profile?.birth_year ?? null,
+      }),
+      supabase.rpc("medication_doses_for_date", { target_date: today }),
+      supabase
+        .from("sleep_records")
+        .select("sleep_date, duration_min")
+        .order("sleep_date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.rpc("daily_nutrition_summary", { target_date: today }),
+      supabase.rpc("weekly_exercise_summary"),
+    ]);
 
   const doses = (dosesResult.data ?? []) as MedicationDose[];
   const takenCount = doses.filter((d) => d.status === "taken").length;
   const pendingCount = doses.filter((d) => d.status === null).length;
   const lastSleep = sleepResult.data;
+  const nutrition = nutritionResult.data?.[0];
+  const exercise = exerciseResult.data?.[0];
 
   // 주요 지표 중 기록이 있는 것만 카드로 띄운다.
   // latest 가 채워진 것만 남기므로 타입에서도 non-null 로 좁힌다.
@@ -73,7 +78,12 @@ export default async function TodayPage() {
     timeZone: timezone,
   }).format(new Date());
 
-  const hasAnything = pinned.length > 0 || doses.length > 0 || lastSleep;
+  const hasAnything =
+    pinned.length > 0 ||
+    doses.length > 0 ||
+    Boolean(lastSleep) ||
+    Number(nutrition?.meal_count ?? 0) > 0 ||
+    Number(exercise?.session_count ?? 0) > 0;
 
   return (
     <>
@@ -125,6 +135,54 @@ export default async function TodayPage() {
               </li>
             ))}
           </ul>
+        </section>
+      ) : null}
+
+      {(nutrition && Number(nutrition.meal_count) > 0) ||
+      (exercise && Number(exercise.session_count) > 0) ? (
+        <section className="mt-6 grid gap-3 sm:grid-cols-2">
+          {nutrition && Number(nutrition.meal_count) > 0 ? (
+            <div className="rounded-xl border border-border p-5">
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-sm font-semibold">오늘 섭취</h2>
+                <Link href="/meals" className="text-xs text-brand-600 hover:underline">
+                  기록하기
+                </Link>
+              </div>
+              <p className="tabular mt-1 text-2xl font-semibold">
+                {Math.round(Number(nutrition.kcal))}
+                <span className="ml-1 text-sm font-normal text-muted">kcal</span>
+              </p>
+              <p className="tabular mt-1 text-xs text-muted">
+                탄수 {Number(nutrition.carb_g).toFixed(0)}g · 단백{" "}
+                {Number(nutrition.protein_g).toFixed(0)}g · 지방{" "}
+                {Number(nutrition.fat_g).toFixed(0)}g
+              </p>
+            </div>
+          ) : null}
+
+          {exercise && Number(exercise.session_count) > 0 ? (
+            <div className="rounded-xl border border-border p-5">
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-sm font-semibold">이번 주 운동</h2>
+                <Link href="/workouts" className="text-xs text-brand-600 hover:underline">
+                  기록하기
+                </Link>
+              </div>
+              <p className="tabular mt-1 text-2xl font-semibold">
+                {exercise.total_min}
+                <span className="ml-1 text-sm font-normal text-muted">분</span>
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                {exercise.goal_min
+                  ? `목표 ${exercise.goal_min}분 중 ${Math.min(
+                      100,
+                      Math.round((Number(exercise.total_min) / exercise.goal_min) * 100),
+                    )}%`
+                  : `${exercise.session_count}회 운동`}
+              </p>
+            </div>
+          ) : null}
         </section>
       ) : null}
 
