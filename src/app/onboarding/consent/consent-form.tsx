@@ -30,6 +30,16 @@ export function ConsentForm({ documents }: { documents: ConsentDocumentView[] })
     [documents],
   );
 
+  const [birthYear, setBirthYear] = useState("");
+
+  // 만 14세 미만은 가입할 수 없다 (개인정보보호법 제22조의2, 이용약관 제4조).
+  // 화면에서 미리 막아 주지만 판정은 서버에서 다시 한다.
+  const thisYear = new Date().getFullYear();
+  const parsedYear = Number(birthYear);
+  const yearLooksValid =
+    /^\d{4}$/.test(birthYear) && parsedYear >= 1900 && parsedYear <= thisYear;
+  const tooYoung = yearLooksValid && thisYear - parsedYear < 14;
+
   const allRequiredChecked = requiredIds.every((id) => checked.has(id));
   const allChecked = documents.length > 0 && documents.every((d) => checked.has(d.id));
 
@@ -111,6 +121,35 @@ export function ConsentForm({ documents }: { documents: ConsentDocumentView[] })
         })}
       </ul>
 
+      <div className="mt-6 rounded-xl border border-border p-4">
+        <label htmlFor="birth_year" className="block text-sm font-medium">
+          태어난 해
+        </label>
+        <p className="mt-1 text-xs leading-relaxed text-muted">
+          만 14세 미만은 가입하실 수 없습니다. 입력하신 값은 연령별 참고범위를
+          적용하는 데에도 쓰입니다.
+        </p>
+        <input
+          id="birth_year"
+          name="birth_year"
+          type="number"
+          inputMode="numeric"
+          required
+          min={1900}
+          max={thisYear}
+          placeholder="1990"
+          value={birthYear}
+          onChange={(event) => setBirthYear(event.target.value)}
+          className="tabular mt-3 w-32 rounded-lg border border-border-strong bg-background
+                     px-3 py-2.5 text-base focus:border-brand-500"
+        />
+        {tooYoung ? (
+          <p role="alert" className="mt-2 text-sm text-status-out">
+            만 14세 미만은 가입하실 수 없습니다.
+          </p>
+        ) : null}
+      </div>
+
       {state.error ? (
         <p role="alert" className="mt-4 text-sm text-status-out">
           {state.error}
@@ -119,7 +158,7 @@ export function ConsentForm({ documents }: { documents: ConsentDocumentView[] })
 
       <button
         type="submit"
-        disabled={!allRequiredChecked || pending}
+        disabled={!allRequiredChecked || !yearLooksValid || tooYoung || pending}
         className="mt-6 w-full rounded-lg bg-brand-600 px-4 py-3 font-medium text-white
                    transition-colors hover:bg-brand-700 disabled:opacity-50"
       >
@@ -129,6 +168,10 @@ export function ConsentForm({ documents }: { documents: ConsentDocumentView[] })
       {!allRequiredChecked ? (
         <p className="mt-2 text-center text-xs text-muted">
           필수 항목에 모두 동의해야 계속할 수 있습니다.
+        </p>
+      ) : !yearLooksValid ? (
+        <p className="mt-2 text-center text-xs text-muted">
+          태어난 해를 입력해 주세요.
         </p>
       ) : null}
     </form>

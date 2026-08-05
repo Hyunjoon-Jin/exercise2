@@ -36,6 +36,25 @@ export async function submitConsents(
     return { error: "동의 문서를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." };
   }
 
+  // 만 14세 미만은 가입할 수 없다 (개인정보보호법 제22조의2, 이용약관 제4조 ②).
+  // 화면에서도 막지만 서버 액션은 직접 호출될 수 있으므로 여기서 다시 본다.
+  const thisYear = new Date().getFullYear();
+  const birthYear = Number(String(formData.get("birth_year") ?? "").trim());
+
+  if (!Number.isInteger(birthYear) || birthYear < 1900 || birthYear > thisYear) {
+    return { error: "태어난 해를 다시 확인해 주세요." };
+  }
+
+  // 생일이 지나지 않았을 수 있으므로 연도 차이로만 판정한다 — 경계에 있는
+  // 사람을 잘못 막기보다 잘못 통과시키는 쪽이 낫다고 보기 어려우나,
+  // 생년월일 전체를 받는 것은 수집 최소화 원칙에 어긋난다.
+  if (thisYear - birthYear < 14) {
+    return {
+      error:
+        "만 14세 미만은 가입하실 수 없습니다. 서비스 이용을 원하시면 고객센터로 문의해 주세요.",
+    };
+  }
+
   const grantedIds = new Set(formData.getAll("consent").map(String));
 
   const missingRequired = documents.filter(
@@ -62,6 +81,10 @@ export async function submitConsents(
   if (insertError) {
     return { error: "동의 저장에 실패했습니다. 잠시 후 다시 시도해 주세요." };
   }
+
+  // 연령 확인에 쓴 값을 프로필에 남긴다. 다음 단계에서 다시 묻지 않고,
+  // 연령별 참고범위 판정에도 그대로 쓰인다.
+  await supabase.from("profiles").update({ birth_year: birthYear }).eq("id", user.id);
 
   redirect("/onboarding/profile");
 }
