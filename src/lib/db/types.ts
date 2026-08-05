@@ -788,6 +788,42 @@ export interface Database {
         Args: { p_extraction_id: string };
         Returns: number;
       };
+      /** 한 주치 요약 한 행. p_week_offset 0=이번 주, 1=지난주 */
+      weekly_report: {
+        Args: { p_week_offset?: number };
+        Returns: {
+          period_start: string;
+          period_end: string;
+          sleep_avg_min: number | null;
+          sleep_nights: number;
+          kcal_avg: number | null;
+          kcal_days: number;
+          exercise_min: number;
+          exercise_sessions: number;
+          exercise_goal_min: number | null;
+          doses_total: number;
+          doses_taken: number;
+          adherence: number | null;
+          weight_avg: number | null;
+          weight_count: number;
+        }[];
+      };
+      metric_period_summary: {
+        Args: { p_start: string; p_end: string };
+        Returns: {
+          metric_code: string;
+          first_value: number;
+          last_value: number;
+          min_value: number;
+          max_value: number;
+          sample_count: number;
+          last_at: string;
+        }[];
+      };
+      pending_checkup_reviews: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
       checkup_summaries: {
         Args: Record<string, never>;
         Returns: {

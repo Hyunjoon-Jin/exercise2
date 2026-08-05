@@ -37,22 +37,29 @@ export default async function TodayPage() {
   const timezone = profile?.timezone ?? "Asia/Seoul";
   const today = todayIn(timezone);
 
-  const [summaries, dosesResult, sleepResult, nutritionResult, exerciseResult] =
-    await Promise.all([
-      getMetricSummaries({
-        sex: profile?.sex ?? "unspecified",
-        birth_year: profile?.birth_year ?? null,
-      }),
-      supabase.rpc("medication_doses_for_date", { target_date: today }),
-      supabase
-        .from("sleep_records")
-        .select("sleep_date, duration_min")
-        .order("sleep_date", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase.rpc("daily_nutrition_summary", { target_date: today }),
-      supabase.rpc("weekly_exercise_summary"),
-    ]);
+  const [
+    summaries,
+    dosesResult,
+    sleepResult,
+    nutritionResult,
+    exerciseResult,
+    pendingReviewResult,
+  ] = await Promise.all([
+    getMetricSummaries({
+      sex: profile?.sex ?? "unspecified",
+      birth_year: profile?.birth_year ?? null,
+    }),
+    supabase.rpc("medication_doses_for_date", { target_date: today }),
+    supabase
+      .from("sleep_records")
+      .select("sleep_date, duration_min")
+      .order("sleep_date", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase.rpc("daily_nutrition_summary", { target_date: today }),
+    supabase.rpc("weekly_exercise_summary"),
+    supabase.rpc("pending_checkup_reviews"),
+  ]);
 
   const doses = (dosesResult.data ?? []) as MedicationDose[];
   const takenCount = doses.filter((d) => d.status === "taken").length;
@@ -60,6 +67,7 @@ export default async function TodayPage() {
   const lastSleep = sleepResult.data;
   const nutrition = nutritionResult.data?.[0];
   const exercise = exerciseResult.data?.[0];
+  const pendingReviews = pendingReviewResult.data ?? 0;
 
   // 주요 지표 중 기록이 있는 것만 카드로 띄운다.
   // latest 가 채워진 것만 남기므로 타입에서도 non-null 로 좁힌다.
@@ -89,6 +97,26 @@ export default async function TodayPage() {
     <>
       <p className="text-sm text-muted">{dateLabel}</p>
       <h1 className="mt-1 text-2xl font-semibold tracking-tight">{name}님</h1>
+
+      {/* 판독은 끝났는데 확정하지 않은 결과지. 알리지 않으면 조용히 묻힌다. */}
+      {pendingReviews > 0 ? (
+        <Link
+          href="/checkups"
+          className="mt-6 flex items-center justify-between gap-3 rounded-xl border
+                     border-status-caution/40 bg-status-caution/5 px-4 py-3.5
+                     transition-colors hover:bg-status-caution/10"
+        >
+          <div>
+            <p className="text-sm font-medium">확인이 필요한 검진 결과지</p>
+            <p className="mt-0.5 text-xs text-muted">
+              {pendingReviews}건의 판독 결과가 확인을 기다리고 있습니다.
+            </p>
+          </div>
+          <span aria-hidden className="shrink-0 text-muted">
+            →
+          </span>
+        </Link>
+      ) : null}
 
       {doses.length > 0 ? (
         <section className="mt-6 rounded-xl border border-border p-5">
@@ -216,6 +244,24 @@ export default async function TodayPage() {
             첫 기록 남기기
           </Link>
         </section>
+      ) : null}
+
+      {hasAnything ? (
+        <Link
+          href="/reports"
+          className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-border
+                     px-4 py-3.5 transition-colors hover:bg-surface"
+        >
+          <div>
+            <p className="text-sm font-medium">이번 주 요약</p>
+            <p className="mt-0.5 text-xs text-muted">
+              수면·식단·운동·복약을 한 주 단위로 모아 봅니다.
+            </p>
+          </div>
+          <span aria-hidden className="shrink-0 text-muted">
+            →
+          </span>
+        </Link>
       ) : null}
 
       <section className="mt-8">
