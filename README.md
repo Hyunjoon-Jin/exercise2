@@ -71,6 +71,10 @@ npm run check   # 타입 검사 + 린트 + 테스트 + 명도대비
 npm run build   # 프로덕션 빌드
 ```
 
+`typecheck` 는 `tsc` 앞에 `next typegen` 을 먼저 돌립니다. `PageProps` ·
+`LayoutProps` 는 Next 가 라우트 구조에서 생성하는 전역 타입이라, 빌드 산출물이
+없는 상태에서 `tsc` 만 돌리면 "Cannot find name 'PageProps'" 로 실패합니다.
+
 **Node 22.18 이상이 필요합니다.** 그 아래에서는 타입 스트리핑이 플래그 뒤에
 있어 `node --test` 가 `.ts` 파일을 실행하지 못하고, 테스트가 실패가 아니라
 "0개 통과"로 조용히 넘어갑니다.
