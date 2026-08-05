@@ -548,6 +548,149 @@ export interface Database {
         };
         Relationships: [];
       };
+
+      checkups: {
+        Row: {
+          id: string;
+          user_id: string;
+          checkup_date: string;
+          institution: string | null;
+          note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          checkup_date: string;
+          institution?: string | null;
+          note?: string | null;
+        };
+        Update: {
+          checkup_date?: string;
+          institution?: string | null;
+          note?: string | null;
+        };
+        Relationships: [];
+      };
+
+      checkup_documents: {
+        Row: {
+          id: string;
+          checkup_id: string;
+          user_id: string;
+          storage_path: string;
+          file_name: string | null;
+          mime_type: string;
+          size_bytes: number | null;
+          page_count: number | null;
+          created_at: string;
+        };
+        Insert: {
+          checkup_id: string;
+          user_id: string;
+          storage_path: string;
+          file_name?: string | null;
+          mime_type: string;
+          size_bytes?: number | null;
+          page_count?: number | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
+
+      checkup_extractions: {
+        Row: {
+          id: string;
+          checkup_id: string;
+          document_id: string;
+          user_id: string;
+          model: string;
+          status: ExtractionStatus;
+          raw_output: Json | null;
+          input_tokens: number | null;
+          output_tokens: number | null;
+          error_message: string | null;
+          started_at: string | null;
+          completed_at: string | null;
+          reviewed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          checkup_id: string;
+          document_id: string;
+          user_id: string;
+          model: string;
+          status?: ExtractionStatus;
+          started_at?: string | null;
+        };
+        Update: {
+          status?: ExtractionStatus;
+          raw_output?: Json | null;
+          input_tokens?: number | null;
+          output_tokens?: number | null;
+          error_message?: string | null;
+          completed_at?: string | null;
+          reviewed_at?: string | null;
+        };
+        Relationships: [];
+      };
+
+      checkup_extraction_items: {
+        Row: {
+          id: string;
+          extraction_id: string;
+          user_id: string;
+          raw_label: string;
+          raw_value: string | null;
+          raw_unit: string | null;
+          reference_range: string | null;
+          confidence: number | null;
+          page_number: number | null;
+          metric_code: string | null;
+          value: number | null;
+          unit: string | null;
+          status: ExtractionItemStatus;
+          health_metric_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          extraction_id: string;
+          user_id: string;
+          raw_label: string;
+          raw_value?: string | null;
+          raw_unit?: string | null;
+          reference_range?: string | null;
+          confidence?: number | null;
+          page_number?: number | null;
+          metric_code?: string | null;
+          value?: number | null;
+          unit?: string | null;
+          status?: ExtractionItemStatus;
+        };
+        Update: {
+          metric_code?: string | null;
+          value?: number | null;
+          unit?: string | null;
+          status?: ExtractionItemStatus;
+        };
+        Relationships: [];
+      };
+
+      /** service_role 전용. 사용자 세션에는 정책이 없어 아무 행도 보이지 않는다. */
+      storage_cleanup_queue: {
+        Row: {
+          id: string;
+          bucket_id: string;
+          storage_path: string;
+          created_at: string;
+          deleted_at: string | null;
+        };
+        Insert: never;
+        Update: { deleted_at?: string | null };
+        Relationships: [];
+      };
     };
 
     Views: Record<never, never>;
@@ -636,6 +779,28 @@ export interface Database {
           goal_min: number | null;
         }[];
       };
+      /** 승격된 항목 수를 돌려준다. 검수를 거치지 않은 항목은 세지 않는다. */
+      confirm_checkup_extraction: {
+        Args: { p_extraction_id: string };
+        Returns: number;
+      };
+      revert_checkup_extraction: {
+        Args: { p_extraction_id: string };
+        Returns: number;
+      };
+      checkup_summaries: {
+        Args: Record<string, never>;
+        Returns: {
+          checkup_id: string;
+          checkup_date: string;
+          institution: string | null;
+          document_count: number;
+          extraction_id: string | null;
+          status: ExtractionStatus | null;
+          item_count: number;
+          confirmed_count: number;
+        }[];
+      };
     };
 
     Enums: {
@@ -663,3 +828,7 @@ export type SleepRecord = Tables<"sleep_records">;
 export type Medication = Tables<"medications">;
 export type MedicationSchedule = Tables<"medication_schedules">;
 export type MedicationLog = Tables<"medication_logs">;
+export type Checkup = Tables<"checkups">;
+export type CheckupDocument = Tables<"checkup_documents">;
+export type CheckupExtraction = Tables<"checkup_extractions">;
+export type CheckupExtractionItem = Tables<"checkup_extraction_items">;

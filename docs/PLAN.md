@@ -159,7 +159,7 @@ users ─┬─ profiles (생년, 성별, 키, 목표)
 | 이미지 입력 | `image` 블록. Opus 5는 고해상도 비전 지원(장변 2576px) → 촬영본 판독에 유리 |
 | 출력 강제 | **Structured Outputs** (`output_config.format` + JSON Schema). 파싱 실패·재시도 루프 자체가 불필요해짐 |
 | 신뢰도 | 스키마에 항목별 `confidence` 필드를 포함시켜, 낮은 항목을 검수 UI에서 강조 |
-| 인용 | `citations: {enabled: true}` 로 원본 페이지 위치를 받아 검수 UI에서 해당 위치를 하이라이트 (선택 사항, Phase 3 후반) |
+| 인용 | ~~`citations: {enabled: true}`~~ — Structured Outputs 와 함께 쓸 수 없다(400). 대신 스키마에 `page_number` 를 두어 검수 UI 가 몇 쪽인지 표시한다 |
 
 ### 추출 스키마 (초안)
 
