@@ -22,6 +22,9 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
             <Link href="/legal/privacy" className="text-muted hover:text-foreground">
               개인정보 처리방침
             </Link>
+            <Link href="/legal/history" className="text-muted hover:text-foreground">
+              개정 이력
+            </Link>
           </nav>
         </div>
       </header>

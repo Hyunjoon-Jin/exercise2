@@ -4,7 +4,11 @@ import { redirect } from "next/navigation";
 import type { MedicationDose } from "@/lib/db/types";
 import { createClient } from "@/lib/supabase/server";
 
-import { deactivateMedication, reactivateMedication } from "./actions";
+import {
+  deactivateMedication,
+  reactivateMedication,
+  setShowMedicationName,
+} from "./actions";
 import { DoseChecklist } from "./dose-checklist";
 import { PushToggle } from "./push-toggle";
 
@@ -34,7 +38,7 @@ export default async function MedicationsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("timezone")
+    .select("timezone, show_medication_name_in_push")
     .eq("id", user.id)
     .single();
 
@@ -108,6 +112,38 @@ export default async function MedicationsPage() {
         <h2 className="text-sm font-semibold">복용 알림</h2>
         <div className="mt-3">
           <PushToggle />
+        </div>
+
+        <div className="mt-4 border-t border-border pt-4">
+          <form action={setShowMedicationName} className="flex items-start gap-3">
+            <input
+              type="hidden"
+              name="show"
+              value={profile?.show_medication_name_in_push ? "0" : "1"}
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium">알림에 약 이름 표시</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                켜면 알림에 &ldquo;메트포르민 500mg&rdquo;처럼 약 이름이 나옵니다.
+                <strong className="font-medium text-foreground">
+                  {" "}
+                  잠금화면에도 그대로 표시되므로 주변 사람이 볼 수 있습니다.
+                </strong>{" "}
+                꺼두면 &ldquo;앱을 열어 확인해 주세요&rdquo;로만 알립니다.
+              </p>
+            </div>
+            <button
+              type="submit"
+              aria-pressed={profile?.show_medication_name_in_push ?? false}
+              className={`min-h-11 shrink-0 rounded-lg border px-3 text-sm transition-colors ${
+                profile?.show_medication_name_in_push
+                  ? "border-brand-500 bg-brand-soft font-medium text-brand-strong"
+                  : "border-border-strong text-muted hover:bg-surface"
+              }`}
+            >
+              {profile?.show_medication_name_in_push ? "표시함" : "표시 안 함"}
+            </button>
+          </form>
         </div>
       </section>
 
