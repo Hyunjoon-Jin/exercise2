@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   디자인 토큰
+
+   건강 데이터는 오래 들여다보는 화면이다. 채도를 낮춰 눈이 피로하지 않게 하고,
+   상태 색(정상/주의/범위 밖)만 또렷하게 남긴다.
+
+   상태 색은 색만으로 구분되지 않도록 UI 에서 항상 텍스트 라벨과 함께 쓴다
+   (접근성 — 색각 이상 사용자 고려).
+   ============================================================================= */
+
+@theme {
+  /* 브랜드 — 차분한 틸 계열 */
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard",
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+/* -----------------------------------------------------------------------------
+   테마별 색
+
+   같은 색값이 밝은 배경과 어두운 배경에서 동시에 WCAG AA(4.5:1)를 넘길 수는
+   없다. 상태색과 링크색을 테마마다 다르게 두고, 화면에서는 의미 이름만 쓴다.
+   (검증: scripts/check-contrast.mjs — npm run a11y:contrast)
+   ----------------------------------------------------------------------------- */
+
+:root {
+  --background: #ffffff;
+  --surface: #f8fafc;
+  /* 카드 외곽선·구분선. 장식이라 대비 기준의 대상이 아니다. */
+  --border: #e2e8f0;
+  /* 입력·선택·보조 버튼의 테두리. 컨트롤의 경계를 알아볼 수 있어야 하므로
+     WCAG 1.4.11 비텍스트 대비 3:1 을 지킨다. */
+  --border-strong: #7d8796;
+  --foreground: #0f172a;
+  /* #64748b 은 --surface 위에서 4.55:1 로 아슬아슬했다. 12px 보조 텍스트에
+     주로 쓰이므로 여유를 두고 어둡게 잡는다. */
+  --muted: #556270;
+
+  --status-normal: #047857;
+  --status-caution: #b45309;
+  --status-out: #b91c1c;
+  --status-unknown: #52606d;
+
+  /* 링크·강조 텍스트. brand-600 은 흰 배경에서 3.74:1 로 AA 에 못 미친다. */
+  --brand-text: #0f766e;
+  /* 선택된 항목의 바탕과 그 위 글자 */
+  --brand-soft: #f0fdfa;
+  --brand-strong: #115e59;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b1120;
+    --surface: #111827;
+    --border: #1f2937;
+    --border-strong: #64748b;
+    --foreground: #e2e8f0;
+    --muted: #94a3b8;
+
+    --status-normal: #34d399;
+    --status-caution: #fbbf24;
+    --status-out: #f87171;
+    --status-unknown: #9ca3af;
+
+    --brand-text: #5eead4;
+    --brand-soft: #134e4a;
+    --brand-strong: #99f6e4;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+
+  --color-status-normal: var(--status-normal);
+  --color-status-caution: var(--status-caution);
+  --color-status-out: var(--status-out);
+  --color-status-unknown: var(--status-unknown);
+
+  --color-brand-text: var(--brand-text);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-strong: var(--brand-strong);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 숫자 표기 — 표·그래프에서 자릿수 정렬 */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 키보드 사용자에게만 포커스 링을 보인다.
+   brand-500 은 흰 배경에서 2.49:1 이라 포커스 표시 기준(3:1)에 못 미친다.
+   테마별로 값이 갈리는 --brand-text 를 쓴다. */
+:focus-visible {
+  outline: 2px solid var(--brand-text);
+  outline-offset: 2px;
+}
+
+/* 움직임에 민감한 사용자를 위해 전환 효과를 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
